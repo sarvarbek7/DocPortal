@@ -13,6 +13,8 @@ internal sealed class OrganizationEntityConfiguration : IEntityTypeConfiguration
 
     builder.HasIndex(org => org.Title);
 
+    builder.HasIndex(org => org.PhysicalIdentity).IsUnique(true);
+
     builder.HasKey(entity => entity.Id);
 
     // IEntity
@@ -22,22 +24,22 @@ internal sealed class OrganizationEntityConfiguration : IEntityTypeConfiguration
     // IAuditableEntity
 
     builder.Property(entity => entity.CreatedBy)
-      .HasColumnName("createdBy");
+      .HasColumnName("created_by");
 
     builder.Property(entity => entity.UpdatedBy)
-      .HasColumnName("updatedBy");
+      .HasColumnName("updated_by");
 
     builder.Property(entity => entity.CreatedAt)
       .HasColumnType("timestamp")
-      .HasColumnName("createdAt");
+      .HasColumnName("created_at");
 
     builder.Property(entity => entity.UpdatedAt)
       .HasColumnType("timestamp")
-      .HasColumnName("updatedAt");
+      .HasColumnName("updated_at");
 
     // ISoftDeletedEntity
     builder.Property(entity => entity.IsDeleted)
-      .HasColumnName("isDeleted");
+      .HasColumnName("is_deleted");
 
     // Custom
     builder.Property(org => org.Title)
@@ -45,11 +47,11 @@ internal sealed class OrganizationEntityConfiguration : IEntityTypeConfiguration
       .HasColumnName("title");
 
     builder.Property(org => org.PrimaryOrganizationId)
-      .HasColumnName("primaryOrganizationId");
+      .HasColumnName("primary_organization_id");
 
     builder.Property(org => org.PhysicalIdentity)
       .HasMaxLength(255)
-      .HasColumnName("physicalIdentity");
+      .HasColumnName("physical_identity");
 
     builder.Property(org => org.Details)
       .HasMaxLength(255)
@@ -65,9 +67,10 @@ internal sealed class OrganizationEntityConfiguration : IEntityTypeConfiguration
 
     builder.HasOne(current => current.PrimaryOrganization)
       .WithMany(navigated => navigated.Subordinates)
-      .HasForeignKey(current => current.PrimaryOrganizationId);
+      .HasForeignKey(current => current.PrimaryOrganizationId)
+      .OnDelete(DeleteBehavior.SetNull);
 
-    builder.HasMany(organization => organization.AssignedRoles)
+    builder.HasMany(organization => organization.Admins)
       .WithOne(role => role.AssignedOrganization)
       .HasForeignKey(role => role.OrganizationId);
   }

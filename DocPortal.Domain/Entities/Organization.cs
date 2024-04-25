@@ -10,6 +10,6 @@ public sealed class Organization : Entity<int, int>
   public string? Details { get; set; }
   public Organization? PrimaryOrganization { get; set; }
   public ICollection<Organization>? Subordinates { get; set; }
-  public ICollection<UserOrganization>? AssignedRoles { get; set; }
+  public ICollection<UserOrganization>? Admins { get; set; }
   public ICollection<Document>? Documents { get; set; }
 }

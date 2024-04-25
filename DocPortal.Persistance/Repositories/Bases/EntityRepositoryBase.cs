@@ -131,7 +131,7 @@ internal abstract class EntityRepositoryBase<TContext, TEntity, TId>(TContext co
   /// <summary>
   /// Delete entity
   /// </summary>
-  /// <param name="entity"></param>
+  ///// <param name="entity"></param>
   /// <param name="saveChanges"></param>
   /// <param name="cancellationToken"></param>
   /// <returns></returns>
@@ -166,7 +166,8 @@ internal abstract class EntityRepositoryBase<TContext, TEntity, TId>(TContext co
                                                      bool saveChanges = true,
                                                      CancellationToken cancellationToken = default)
   {
-    var foundEntity = await GetEntityByIdAsync(id: id, cancellationToken: cancellationToken);
+    var foundEntity =
+      await GetEntityByIdAsync(id: id, cancellationToken: cancellationToken);
 
     return await DeleteEntityAsync(foundEntity, saveChanges, cancellationToken);
   }
@@ -215,7 +216,7 @@ internal abstract class EntityRepositoryBase<TContext, TEntity, TId>(TContext co
     return await DeleteEntitiesAsync(foundEntities, saveChanges, cancellationToken);
   }
 
-  public async Task<int> SaveChanges(CancellationToken cancellationToken = default)
+  public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
   {
     return await DbContext.SaveChangesAsync(cancellationToken);
   }

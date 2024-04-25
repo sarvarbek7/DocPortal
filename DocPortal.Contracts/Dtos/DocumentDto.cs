@@ -6,4 +6,6 @@ public record DocumentDto(Guid Id,
                           DateOnly RegisteredDate,
                           bool IsPrivate,
                           int OrganizationId,
-                          int DocumentTypeId);
+                          int DocumentTypeId,
+                          DocumentTypeDto? DocumentType,
+                          OrganizationDto? Organization);

@@ -9,7 +9,7 @@ internal sealed class UserOrganizationEntityConfiguration : IEntityTypeConfigura
 {
   public void Configure(EntityTypeBuilder<UserOrganization> builder)
   {
-    builder.ToTable("userOrganizations");
+    builder.ToTable("user_organizations");
 
     builder.HasKey(entity => entity.Id);
 
@@ -19,13 +19,13 @@ internal sealed class UserOrganizationEntityConfiguration : IEntityTypeConfigura
       .HasColumnName("id");
 
     builder.Property(userOrganization => userOrganization.UserId)
-      .HasColumnName("userId");
+      .HasColumnName("user_id");
 
     builder.Property(userOrganization => userOrganization.OrganizationId)
-      .HasColumnName("organizationId");
+      .HasColumnName("organization_id");
 
     builder.HasOne(role => role.AssignedOrganization)
-      .WithMany(org => org.AssignedRoles)
+      .WithMany(org => org.Admins)
       .HasForeignKey(role => role.OrganizationId);
 
     builder.HasOne(role => role.Admin)

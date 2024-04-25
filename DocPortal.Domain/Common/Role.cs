@@ -1,9 +1,15 @@
-﻿namespace DocPortal.Domain.Common
+﻿namespace DocPortal.Domain.Common;
+
+public static class Role
 {
-  public static class Role
+  public const string Admin = "admin";
+  public const string SuperAdmin = "superadmin";
+  public const string User = "user";
+
+  private static string[] availableRoles = [Admin, SuperAdmin, User];
+
+  public static IEnumerable<string> AvailableRoles
   {
-    public const string Admin = "Admin";
-    public const string SuperAdmin = "SuperAdmin";
-    public const string User = "User";
+    get => availableRoles.Select(role => role.ToLower());
   }
 }

@@ -3,5 +3,6 @@
 namespace DocPortal.Application.Common.Authentication;
 
 public record RegisterDetails(User User,
-                              string? Password = null,
+                              string Login,
+                              string Password,
                               ICollection<UserOrganization>? UserOrganizations = null);

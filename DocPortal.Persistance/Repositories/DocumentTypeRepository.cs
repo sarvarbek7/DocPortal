@@ -5,6 +5,8 @@ using DocPortal.Persistance.DataContext;
 using DocPortal.Persistance.Repositories.Bases;
 using DocPortal.Persistance.Repositories.Interfaces;
 
+using Microsoft.EntityFrameworkCore;
+
 namespace DocPortal.Persistance.Repositories;
 
 internal class DocumentTypeRepository(ApplicationDbContext context) :
@@ -25,6 +27,13 @@ internal class DocumentTypeRepository(ApplicationDbContext context) :
                                                            bool saveChanges = true,
                                                            CancellationToken cancellationToken = default)
     => base.DeleteEntityByIdAsync(id, saveChanges, cancellationToken);
+
+  public async ValueTask<bool> EntityExistsAsync(Expression<Func<DocumentType, bool>>? predicate = null, CancellationToken cancellationToken = default)
+  {
+    return predicate is null
+      ? await DbContext.Set<DocumentType>().AnyAsync(cancellationToken)
+      : await DbContext.Set<DocumentType>().AnyAsync(predicate, cancellationToken);
+  }
 
   public new IQueryable<DocumentType> GetEntities(Expression<Func<DocumentType, bool>>? predicate = null,
                                                   bool asNoTracking = false)

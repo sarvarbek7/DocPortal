@@ -9,8 +9,8 @@ namespace DocPortal.Api.Mappings
   {
     public void Register(TypeAdapterConfig config)
     {
-      config.NewConfig<UserDto, User>()
-        .TwoWays();
+      config.NewConfig<User, UserDto>();
+      config.NewConfig<UserDto, User>();
     }
   }
 }

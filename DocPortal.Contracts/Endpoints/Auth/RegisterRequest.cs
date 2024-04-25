@@ -6,4 +6,4 @@ public record RegisterRequest(UserDto User,
                               string Login,
                               string Password,
                               string? Role,
-                              ICollection<UserOrganizationDto>? UserOrganizations = null);
+                              ICollection<int>? UserOrganizations = null);

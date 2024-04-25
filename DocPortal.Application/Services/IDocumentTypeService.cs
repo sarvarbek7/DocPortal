@@ -3,6 +3,6 @@ using DocPortal.Domain.Entities;
 
 namespace DocPortal.Application.Services;
 
-public interface IDocumentTypeService : ICRUDService<DocumentType, int>
+public interface IDocumentTypeService : ICrudService<DocumentType, int>
 {
 }

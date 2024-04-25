@@ -5,7 +5,9 @@ using ErrorOr;
 
 namespace DocPortal.Application.Services;
 
-public interface IUserService : ICRUDService<User, int>
+public interface IUserService : ICrudService<User, int>
 {
-  ValueTask<ErrorOr<User>> RetrieveUserByLoginAsync(string login);
+  ValueTask<ErrorOr<User>> RetrieveUserByIdWithDetails(int id,
+                                                       bool asNoTracking = false,
+                                                       ICollection<string>? includedNavigationalProperties = null);
 }

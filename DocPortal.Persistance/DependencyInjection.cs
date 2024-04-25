@@ -20,7 +20,10 @@ public static class DependencyInjection
 
       if (connectionString is not null)
       {
-        options.UseNpgsql(connectionString);
+        options.UseNpgsql(connectionString, options =>
+        {
+          options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+        });
       }
     });
 
@@ -35,7 +38,8 @@ public static class DependencyInjection
       .AddScoped<IDocumentTypeRepository, DocumentTypeRepository>()
       .AddScoped<IOrganizationRepository, OrganizationRepository>()
       .AddScoped<IUserRepository, UserRepository>()
-      .AddScoped<IUserOrganizationRepository, UserOrganizationRepository>();
+      .AddScoped<IUserOrganizationRepository, UserOrganizationRepository>()
+      .AddScoped<IUserCredentialsRepository, UserCredentialRepository>();
 
     return services;
   }

@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using System.Text;
 
+using DocPortal.Api.QueryServices;
+using DocPortal.Domain.Entities;
 using DocPortal.Infrastructure.Common.Authentication;
 
 using Mapster;
@@ -64,5 +66,12 @@ internal static partial class HostConfigurations
       });
 
     services.AddAuthorization();
+  }
+
+  private static void AddQueryServices(this IServiceCollection services)
+  {
+    services.AddSingleton<IQueryService<Organization>, OrganizationQueryService>();
+    services.AddSingleton<IQueryService<User>, UserQueryService>();
+    services.AddSingleton<IQueryService<Document>, DocumentQueryService>();
   }
 }

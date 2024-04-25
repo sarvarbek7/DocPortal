@@ -9,7 +9,7 @@ internal sealed class DocumentTypeEntityConfiguration : IEntityTypeConfiguration
 {
   public void Configure(EntityTypeBuilder<DocumentType> builder)
   {
-    builder.ToTable("documentTypes");
+    builder.ToTable("document_types");
 
     builder.HasKey(docType => docType.Id);
 

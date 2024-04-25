@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 using DocPortal.Api.Configurations;
 
 internal class Program
@@ -13,6 +15,27 @@ internal class Program
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 
+    builder.Services.ConfigureHttpJsonOptions(options =>
+    {
+      options.SerializerOptions.AllowTrailingCommas = true;
+      options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+      options.SerializerOptions.PropertyNameCaseInsensitive = true;
+      options.SerializerOptions.WriteIndented = true;
+    });
+
+    const string _myCustomCorsPolicy = "FrontEndRequests";
+    // Add services to the container.
+    builder.Services.AddCors(options =>
+    {
+      options.AddPolicy(name: _myCustomCorsPolicy,
+        builder =>
+        {
+          builder.WithOrigins("http://localhost:5173")
+          .AllowAnyMethod()
+          .AllowAnyHeader();
+        });
+    });
+
     builder.Configure();
 
     var app = builder.Build();
@@ -27,6 +50,9 @@ internal class Program
     app.UseExceptionHandler("/error");
 
     app.UseHttpsRedirection();
+    app.UseRouting();
+
+    app.UseCors(_myCustomCorsPolicy);
 
     app.UseAuthorization();
 

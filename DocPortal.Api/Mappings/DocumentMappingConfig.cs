@@ -9,8 +9,11 @@ namespace DocPortal.Api.Mappings
   {
     public void Register(TypeAdapterConfig config)
     {
+      config.NewConfig<Document, DocumentDto>();
+
       config.NewConfig<DocumentDto, Document>()
-        .TwoWays();
+        .Ignore(dest => dest.DocumentType)
+        .Ignore(dest => dest.Organization);
     }
   }
 }

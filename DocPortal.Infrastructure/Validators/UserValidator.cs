@@ -17,9 +17,5 @@ internal class UserValidator : AbstractValidator<User>
     RuleFor(user => user.LastName).NotEmpty().MaximumLength(127);
 
     RuleFor(user => user.JobPosition).NotEmpty().MaximumLength(127);
-
-    RuleFor(user => user.Login).MaximumLength(127);
-
-    RuleFor(user => user.PasswordHash).MaximumLength(63);
   }
 }

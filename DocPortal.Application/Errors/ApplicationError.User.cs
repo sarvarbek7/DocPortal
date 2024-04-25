@@ -13,6 +13,12 @@ namespace DocPortal.Application.Errors
       public static Error AlreadyExistsUserWithLogin =>
         Error.Conflict(code: "User.AlreadyExists",
                        description: "User is already exists with this login");
+
+      public static Error AlreadyAssignedToOrganizations =>
+        Error.Validation("User.AlreadyAssigned", description: "The user already assigned these organizations");
+
+      public static Error NotAssigned =>
+        Error.Validation("User.NotAssigned", description: "User not assigned this organization");
     }
   }
 }

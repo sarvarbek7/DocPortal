@@ -21,18 +21,18 @@ internal sealed class DocumentEntityConfiguration : IEntityTypeConfiguration<Doc
       .HasColumnName("id");
 
     builder.Property(entity => entity.CreatedBy)
-      .HasColumnName("createdBy");
+      .HasColumnName("created_by");
 
     builder.Property(entity => entity.UpdatedBy)
-      .HasColumnName("updatedBy");
+      .HasColumnName("updated_by");
 
     builder.Property(entity => entity.CreatedAt)
       .HasColumnType("timestamp")
-      .HasColumnName("createdAt");
+      .HasColumnName("created_at");
 
     builder.Property(entity => entity.UpdatedAt)
       .HasColumnType("timestamp")
-      .HasColumnName("updatedAt");
+      .HasColumnName("updated_at");
 
     builder.Property(entity => entity.Title)
       .HasMaxLength(1023)
@@ -40,22 +40,22 @@ internal sealed class DocumentEntityConfiguration : IEntityTypeConfiguration<Doc
 
     builder.Property(entity => entity.RegisteredNumber)
       .HasMaxLength(63)
-      .HasColumnName("registeredNumber");
+      .HasColumnName("registered_number");
 
     builder.Property(entity => entity.RegisteredDate)
-      .HasColumnName("registeredDate");
+      .HasColumnName("registered_date");
 
     builder.Property(entity => entity.IsPrivate)
-      .HasColumnName("isPrivate");
+      .HasColumnName("is_private");
 
     builder.Property(entity => entity.StoragePath)
-      .HasColumnName("storagePath");
+      .HasColumnName("storage_path");
 
     builder.Property(entity => entity.OrganizationId)
-      .HasColumnName("organizationId");
+      .HasColumnName("organization_id");
 
     builder.Property(entity => entity.DocumentTypeId)
-      .HasColumnName("documentTypeId");
+      .HasColumnName("document_type_id");
 
     builder.HasOne(entity => entity.Organization)
       .WithMany(org => org.Documents)
@@ -64,5 +64,8 @@ internal sealed class DocumentEntityConfiguration : IEntityTypeConfiguration<Doc
     builder.HasOne(entity => entity.DocumentType)
       .WithMany(docType => docType.Documents)
       .HasForeignKey(entity => entity.DocumentTypeId);
+
+    builder.Navigation(
+      doctype => doctype.DocumentType).AutoInclude();
   }
 }

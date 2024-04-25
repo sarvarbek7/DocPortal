@@ -1,13 +1,13 @@
 ﻿using System.Linq.Expressions;
 
+using DocPortal.Application.Options;
 using DocPortal.Domain.Common.Entities;
-using DocPortal.Domain.Options;
 
 using ErrorOr;
 
 namespace DocPortal.Application.Services.Bases;
 
-public interface ICRUDService<TEntity, TId>
+public interface ICrudService<TEntity, TId>
   where TEntity : class, IEntity<TId>
   where TId : struct
 {
@@ -36,5 +36,5 @@ public interface ICRUDService<TEntity, TId>
                                 bool saveChanges = true,
                                 CancellationToken cancellationToken = default);
 
-  Task<int> SaveChanges(CancellationToken cancellationToken = default);
+  Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

@@ -1,4 +1,6 @@
-﻿using DocPortal.Domain.Common.Entities;
+﻿using System.Linq.Expressions;
+
+using DocPortal.Domain.Common.Entities;
 
 namespace DocPortal.Persistance.Repositories.Interfaces.Bases
 {
@@ -6,6 +8,7 @@ namespace DocPortal.Persistance.Repositories.Interfaces.Bases
       where TEntity : class, IEntity<TId>
       where TId : struct
   {
-    Task<int> SaveChanges(CancellationToken cancellationToken = default);
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+    ValueTask<bool> EntityExistsAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default);
   }
 }

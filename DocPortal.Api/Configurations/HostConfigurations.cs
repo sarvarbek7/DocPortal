@@ -27,6 +27,8 @@ internal static partial class HostConfigurations
 
     builder.Services.AddMappers();
 
+    builder.Services.AddQueryServices();
+
     return builder;
   }
 

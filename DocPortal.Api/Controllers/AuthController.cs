@@ -13,12 +13,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DocPortal.Api.Controllers
 {
+  [Authorize(Roles = Role.SuperAdmin)]
   [Route("api/[controller]")]
-  public class AuthController(IAuthService authService, IMapper mapper) : ApiController
+  public class AuthController(IAuthService authService, IMapper mapper) : _ApiController
   {
-    [Authorize(Roles = Role.SuperAdmin)]
     [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterRequest request)
+    public async ValueTask<IActionResult> Register(RegisterRequest request)
     {
       try
       {
@@ -32,13 +32,51 @@ namespace DocPortal.Api.Controllers
           return Problem(result.Errors);
         }
 
-        var registerResponce = mapper.Map<RegisterResponce>(result.Value);
+        var registerResponce = mapper.Map<RegisterResponse>(result.Value);
 
         return Ok(registerResponce);
       }
       catch (Exception ex)
       {
         return Problem([Error.Unexpected(description: ex.Message)]);
+      }
+    }
+
+    [HttpPut("credentials")]
+    public async ValueTask<IActionResult> UpdateUserCredential(UpdateUserCredentialRequest request)
+    {
+      try
+      {
+        var details = mapper.Map<UpdateCredentialDetails>(request);
+
+        var errorOrUserCred =
+          await authService.UpdateUserCredentialAsync(details);
+
+        return errorOrUserCred.Match(
+          value => Ok(mapper.Map<UpdateUserCredentialResponce>(value)),
+          Problem);
+      }
+      catch (Exception ex)
+      {
+        return Problem([Error.Unexpected()]);
+      }
+    }
+
+    [HttpDelete("credentials/{id:int:required}")]
+    public async ValueTask<IActionResult> DeleteUserCredential(int id)
+    {
+      try
+      {
+        var errorOrValue =
+          await authService.DeleterUserCredentialAsync(id);
+
+        return errorOrValue.Match(
+          value => NoContent(),
+          Problem);
+      }
+      catch
+      {
+        return Problem([Error.Unexpected()]);
       }
     }
 
@@ -60,7 +98,7 @@ namespace DocPortal.Api.Controllers
 
         AccessToken accessToken = accessTokenOrError.Value;
 
-        var response = mapper.Map<LoginResponce>(accessToken);
+        var response = mapper.Map<LoginResponse>(accessToken);
 
         return Ok(response);
       }
@@ -68,6 +106,13 @@ namespace DocPortal.Api.Controllers
       {
         return Problem([Error.Unexpected(description: ex.Message)]);
       }
+    }
+
+    [AllowAnonymous]
+    [HttpGet("logout")]
+    public IActionResult Logout()
+    {
+      return Ok();
     }
   }
 }

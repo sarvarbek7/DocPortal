@@ -31,38 +31,38 @@ namespace DocPortal.Persistance.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp")
-                        .HasColumnName("createdAt");
+                        .HasColumnName("created_at");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("integer")
-                        .HasColumnName("createdBy");
+                        .HasColumnName("created_by");
 
                     b.Property<int>("DocumentTypeId")
                         .HasColumnType("integer")
-                        .HasColumnName("documentTypeId");
+                        .HasColumnName("document_type_id");
 
                     b.Property<bool>("IsPrivate")
                         .HasColumnType("boolean")
-                        .HasColumnName("isPrivate");
+                        .HasColumnName("is_private");
 
                     b.Property<int>("OrganizationId")
                         .HasColumnType("integer")
-                        .HasColumnName("organizationId");
+                        .HasColumnName("organization_id");
 
                     b.Property<DateOnly>("RegisteredDate")
                         .HasColumnType("date")
-                        .HasColumnName("registeredDate");
+                        .HasColumnName("registered_date");
 
                     b.Property<string>("RegisteredNumber")
                         .IsRequired()
                         .HasMaxLength(63)
                         .HasColumnType("character varying(63)")
-                        .HasColumnName("registeredNumber");
+                        .HasColumnName("registered_number");
 
                     b.Property<string>("StoragePath")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("storagePath");
+                        .HasColumnName("storage_path");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -72,11 +72,11 @@ namespace DocPortal.Persistance.Migrations
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp")
-                        .HasColumnName("updatedAt");
+                        .HasColumnName("updated_at");
 
                     b.Property<int>("UpdatedBy")
                         .HasColumnType("integer")
-                        .HasColumnName("updatedBy");
+                        .HasColumnName("updated_by");
 
                     b.HasKey("Id");
 
@@ -108,7 +108,7 @@ namespace DocPortal.Persistance.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("documentTypes", (string)null);
+                    b.ToTable("document_types", (string)null);
                 });
 
             modelBuilder.Entity("DocPortal.Domain.Entities.Organization", b =>
@@ -122,11 +122,11 @@ namespace DocPortal.Persistance.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp")
-                        .HasColumnName("createdAt");
+                        .HasColumnName("created_at");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("integer")
-                        .HasColumnName("createdBy");
+                        .HasColumnName("created_by");
 
                     b.Property<string>("Details")
                         .HasMaxLength(255)
@@ -135,17 +135,17 @@ namespace DocPortal.Persistance.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
-                        .HasColumnName("isDeleted");
+                        .HasColumnName("is_deleted");
 
                     b.Property<string>("PhysicalIdentity")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
-                        .HasColumnName("physicalIdentity");
+                        .HasColumnName("physical_identity");
 
                     b.Property<int?>("PrimaryOrganizationId")
                         .HasColumnType("integer")
-                        .HasColumnName("primaryOrganizationId");
+                        .HasColumnName("primary_organization_id");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -155,13 +155,16 @@ namespace DocPortal.Persistance.Migrations
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp")
-                        .HasColumnName("updatedAt");
+                        .HasColumnName("updated_at");
 
                     b.Property<int>("UpdatedBy")
                         .HasColumnType("integer")
-                        .HasColumnName("updatedBy");
+                        .HasColumnName("updated_by");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PhysicalIdentity")
+                        .IsUnique();
 
                     b.HasIndex("PrimaryOrganizationId");
 
@@ -181,48 +184,38 @@ namespace DocPortal.Persistance.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp")
-                        .HasColumnName("createdAt");
+                        .HasColumnName("created_at");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("integer")
-                        .HasColumnName("createdBy");
+                        .HasColumnName("created_by");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(127)
                         .HasColumnType("character varying(127)")
-                        .HasColumnName("firstName");
+                        .HasColumnName("firstname");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
-                        .HasColumnName("isDeleted");
+                        .HasColumnName("is_deleted");
 
                     b.Property<string>("JobPosition")
                         .IsRequired()
                         .HasMaxLength(127)
                         .HasColumnType("character varying(127)")
-                        .HasColumnName("jobPosition");
+                        .HasColumnName("job_position");
 
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(127)
                         .HasColumnType("character varying(127)")
-                        .HasColumnName("lastName");
-
-                    b.Property<string>("Login")
-                        .HasMaxLength(127)
-                        .HasColumnType("character varying(127)")
-                        .HasColumnName("login");
-
-                    b.Property<string>("PasswordHash")
-                        .HasMaxLength(63)
-                        .HasColumnType("character varying(63)")
-                        .HasColumnName("passwordHash");
+                        .HasColumnName("lastname");
 
                     b.Property<string>("PhysicalIdentity")
                         .IsRequired()
                         .HasColumnType("char(14)")
-                        .HasColumnName("physicalIdentity");
+                        .HasColumnName("physical_identity");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -232,18 +225,41 @@ namespace DocPortal.Persistance.Migrations
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp")
-                        .HasColumnName("updatedAt");
+                        .HasColumnName("updated_at");
 
                     b.Property<int>("UpdatedBy")
                         .HasColumnType("integer")
-                        .HasColumnName("updatedBy");
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("users", (string)null);
+                });
+
+            modelBuilder.Entity("DocPortal.Domain.Entities.UserCredential", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Login")
+                        .IsRequired()
+                        .HasMaxLength(127)
+                        .HasColumnType("character varying(127)")
+                        .HasColumnName("login");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(63)
+                        .HasColumnType("character varying(63)")
+                        .HasColumnName("password");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Login")
                         .IsUnique();
 
-                    b.ToTable("users", (string)null);
+                    b.ToTable("user_credentials", (string)null);
                 });
 
             modelBuilder.Entity("DocPortal.Domain.Entities.UserOrganization", b =>
@@ -257,11 +273,11 @@ namespace DocPortal.Persistance.Migrations
 
                     b.Property<int>("OrganizationId")
                         .HasColumnType("integer")
-                        .HasColumnName("organizationId");
+                        .HasColumnName("organization_id");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer")
-                        .HasColumnName("userId");
+                        .HasColumnName("user_id");
 
                     b.HasKey("Id");
 
@@ -269,7 +285,7 @@ namespace DocPortal.Persistance.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("userOrganizations", (string)null);
+                    b.ToTable("user_organizations", (string)null);
                 });
 
             modelBuilder.Entity("DocPortal.Domain.Entities.Document", b =>
@@ -295,21 +311,31 @@ namespace DocPortal.Persistance.Migrations
                 {
                     b.HasOne("DocPortal.Domain.Entities.Organization", "PrimaryOrganization")
                         .WithMany("Subordinates")
-                        .HasForeignKey("PrimaryOrganizationId");
+                        .HasForeignKey("PrimaryOrganizationId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("PrimaryOrganization");
+                });
+
+            modelBuilder.Entity("DocPortal.Domain.Entities.UserCredential", b =>
+                {
+                    b.HasOne("DocPortal.Domain.Entities.User", null)
+                        .WithOne("UserCredential")
+                        .HasForeignKey("DocPortal.Domain.Entities.UserCredential", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("DocPortal.Domain.Entities.UserOrganization", b =>
                 {
                     b.HasOne("DocPortal.Domain.Entities.Organization", "AssignedOrganization")
-                        .WithMany("AssignedRoles")
+                        .WithMany("Admins")
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DocPortal.Domain.Entities.User", "Admin")
-                        .WithMany("Roles")
+                        .WithMany("UserOrganizations")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -326,7 +352,7 @@ namespace DocPortal.Persistance.Migrations
 
             modelBuilder.Entity("DocPortal.Domain.Entities.Organization", b =>
                 {
-                    b.Navigation("AssignedRoles");
+                    b.Navigation("Admins");
 
                     b.Navigation("Documents");
 
@@ -335,7 +361,9 @@ namespace DocPortal.Persistance.Migrations
 
             modelBuilder.Entity("DocPortal.Domain.Entities.User", b =>
                 {
-                    b.Navigation("Roles");
+                    b.Navigation("UserCredential");
+
+                    b.Navigation("UserOrganizations");
                 });
 #pragma warning restore 612, 618
         }
