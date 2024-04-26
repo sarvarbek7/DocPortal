@@ -32,21 +32,39 @@ public class DocumentsController(IDocumentService documentService,
 {
   [AllowAnonymous]
   [HttpGet]
-  public IActionResult GetAllDocuments([FromQuery] GetAllDocumentsRequest request)
+  public IActionResult GetAllDocuments([FromQuery] int? limit,
+                                       [FromQuery] int? page,
+                                       [FromQuery] string? title,
+                                       [FromQuery] string? registerNumber,
+                                       [FromQuery] int? organizationId,
+                                       [FromQuery] int? documentTypeId,
+                                       [FromQuery] DateOnly? startDate,
+                                       [FromQuery] DateOnly? endDate,
+                                       [FromQuery] bool includeDocumentType = false,
+                                       [FromQuery] bool includeOrganization = false)
   {
     try
     {
       var pageOptions = new PageOptions(
-        request.PaginationOptions?.Limit,
-        request.PaginationOptions?.Page);
+        limit,
+        page);
+      var documentFilterOptions = new DocumentFilterOptions(title,
+                                                            registerNumber,
+                                                            organizationId,
+                                                            documentTypeId,
+                                                            startDate,
+                                                            endDate);
 
       Expression<Func<Document, bool>>? predicate =
-        queryService.ApplyFilterOptions(request.DocumentFilterOptions);
+        queryService.ApplyFilterOptions(documentFilterOptions);
 
       int total = statisticsService.GetDocumentsCount(predicate);
 
+      var documentIncludeQueryOptions = new DocumentIncludeQueryOptions(includeDocumentType,
+                                                                        includeOrganization);
+
       ICollection<string> includedNavigationalProperties =
-        queryService.ApplyIncludeQueries(request.DocumentIncludeQueryOptions);
+        queryService.ApplyIncludeQueries(documentIncludeQueryOptions);
 
       var documents =
         documentService.RetrieveAll(pageOptions, predicate, asNoTracking: false, includedNavigationalProperties);

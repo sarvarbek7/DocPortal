@@ -1,4 +1,6 @@
-﻿using DocPortal.Api.QueryServices;
+﻿using System.Linq.Expressions;
+
+using DocPortal.Api.QueryServices;
 using DocPortal.Application.Options;
 using DocPortal.Application.Services;
 using DocPortal.Application.Services.Processing;
@@ -81,6 +83,59 @@ public class UsersController(IUserService userService,
         Problem);
     }
     catch (Exception ex)
+    {
+      return Problem([Error.Unexpected()]);
+    }
+  }
+
+  [Authorize(Roles = $"{Role.Admin},{Role.SuperAdmin}")]
+  [HttpGet("{id:int:required}/organizations")]
+  public async ValueTask<IActionResult> GetUserOrganizations(int id,
+                                                             [FromQuery] int? limit,
+                                                             [FromQuery] int? page)
+  {
+    try
+    {
+      var pageOptions = new PageOptions(limit, page);
+
+      ICollection<string> includedProperties = [nameof(UserOrganization.AssignedOrganization)];
+
+      List<UserOrganization> userOrgs =
+        userOrganizationService.RetrieveAll(pageOptions,
+                                            predicate: userOrg => userOrg.UserId == id,
+                                            includedNavigationalProperties: includedProperties).ToList();
+
+      List<Organization> organizations =
+        userOrgs.Select(userOrg => userOrg.AssignedOrganization).ToList();
+
+      Expression<Func<Document, bool>> predicate =
+        (Document doc) => organizations.Select(org => org.Id).Contains(doc.OrganizationId);
+
+      var counts =
+        statisticsService.GetDocumentsCountGroupByOrganization(predicate);
+
+      return Ok(new GetUserOrganizationsResponse(
+        Organizations: organizations.Select(organization =>
+        {
+          var subordinates = statisticsService.GetSubordinates(organization.Id);
+
+          return new GetUserOrganizationsResponse.Organization(
+          Id: organization.Id,
+          Title: organization.Title,
+          PhysicalIdentity: organization.PhysicalIdentity,
+          PrimaryOrganizationId: organization.PrimaryOrganizationId,
+          PrimaryOrganizationTitle: organization.PrimaryOrganization?.Title,
+          Details: organization.Details,
+          SubordinatesCount: subordinates.Count,
+          DocumentsCount: counts.Find(docC => docC.OrganizationId == organization.Id)?.Count ?? 0,
+          DocumentsCountIncludeSubordinates: counts.Where(count =>
+            subordinates.Contains(count.OrganizationId) || count.OrganizationId == organization.Id).Sum(docCount => docCount.Count)
+          );
+
+        }).ToList()
+    ));
+    }
+    catch
     {
       return Problem([Error.Unexpected()]);
     }

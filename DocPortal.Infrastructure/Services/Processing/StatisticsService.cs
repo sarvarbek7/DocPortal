@@ -2,7 +2,10 @@
 
 using DocPortal.Application.Services.Processing;
 using DocPortal.Domain.Entities;
+using DocPortal.Domain.Statistics;
 using DocPortal.Persistance.DataContext;
+
+using Microsoft.EntityFrameworkCore;
 
 namespace DocPortal.Infrastructure.Services.Processing;
 
@@ -47,4 +50,29 @@ internal class StatisticsService(ApplicationDbContext dbContext) : IStatisticsSe
   }
 
   public int GetDocumentTypesCount() => dbContext.DocumentTypes.Count();
+
+  public List<DocumentCountByOrganization> GetDocumentsCountGroupByOrganization(Expression<Func<Document, bool>>? predicate)
+  {
+    var initialQuery = dbContext.Documents.AsQueryable();
+
+    if (predicate is not null)
+    {
+      initialQuery = initialQuery.Where(predicate);
+    }
+
+    var docCountsByGroup = initialQuery.GroupBy(
+      keySelector: document => document.OrganizationId,
+      resultSelector: (key, documents) =>
+        new DocumentCountByOrganization(key, documents.Count())).ToList();
+
+    return docCountsByGroup;
+  }
+
+  public List<int> GetSubordinates(int id)
+  {
+    return dbContext.Database
+      .SqlQuery<int>($"select * from get_subordinate_ids({id})")
+      .AsEnumerable()
+      .Where(subId => subId != id).ToList();
+  }
 }

@@ -10,7 +10,14 @@ internal class Program
 
     // Add services to the container.
 
-    builder.Services.AddControllers();
+    builder.Services.AddControllers().AddJsonOptions(options =>
+    {
+      options.JsonSerializerOptions.AllowTrailingCommas = true;
+      options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+      options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+      options.JsonSerializerOptions.WriteIndented = true;
+    });
+
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
