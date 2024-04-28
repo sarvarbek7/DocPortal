@@ -2,9 +2,8 @@
 
 namespace DocPortal.Domain.Entities;
 
-public sealed class Document : IEntity<Guid>, IAuditableEntity<int>
+public sealed class Document : Entity<Guid, int>
 {
-  public Guid Id { get; set; }
   public string Title { get; set; }
   public string RegisteredNumber { get; set; }
   public DateOnly RegisteredDate { get; set; }
@@ -14,8 +13,4 @@ public sealed class Document : IEntity<Guid>, IAuditableEntity<int>
   public int DocumentTypeId { get; set; }
   public Organization? Organization { get; set; }
   public DocumentType? DocumentType { get; set; }
-  public int CreatedBy { get; set; }
-  public int UpdatedBy { get; set; }
-  public DateTime CreatedAt { get; set; }
-  public DateTime UpdatedAt { get; set; }
 }

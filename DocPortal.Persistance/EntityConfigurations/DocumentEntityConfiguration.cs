@@ -11,6 +11,8 @@ internal sealed class DocumentEntityConfiguration : IEntityTypeConfiguration<Doc
   {
     builder.ToTable("documents");
 
+    builder.HasQueryFilter(document => document.IsDeleted);
+
     builder.HasKey(entity => entity.Id);
 
     builder.HasIndex(entity => entity.RegisteredNumber);
@@ -33,6 +35,9 @@ internal sealed class DocumentEntityConfiguration : IEntityTypeConfiguration<Doc
     builder.Property(entity => entity.UpdatedAt)
       .HasColumnType("timestamp")
       .HasColumnName("updated_at");
+
+    builder.Property(entity => entity.IsDeleted)
+      .HasColumnName("is_deleted");
 
     builder.Property(entity => entity.Title)
       .HasMaxLength(1023)

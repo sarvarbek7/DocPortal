@@ -11,6 +11,8 @@ internal sealed class UserEntityConfiguration : IEntityTypeConfiguration<User>
   {
     builder.ToTable("users");
 
+    builder.HasQueryFilter(user => !user.IsDeleted);
+
     builder.HasKey(entity => entity.Id);
 
     // IEntity

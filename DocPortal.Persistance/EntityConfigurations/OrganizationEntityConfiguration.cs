@@ -11,6 +11,8 @@ internal sealed class OrganizationEntityConfiguration : IEntityTypeConfiguration
   {
     builder.ToTable("organizations");
 
+    builder.HasQueryFilter(org => !org.IsDeleted);
+
     builder.HasIndex(org => org.Title);
 
     builder.HasIndex(org => org.PhysicalIdentity).IsUnique(true);

@@ -87,7 +87,7 @@ public class DocumentsController(IDocumentService documentService,
     try
     {
       var queryOptions =
-      new DocumentIncludeQueryOptions(true, true);
+      new DocumentIncludeQueryOptions(true, false);
 
       ICollection<string>? includedNavigationalProperties =
         queryService.ApplyIncludeQueries(queryOptions);

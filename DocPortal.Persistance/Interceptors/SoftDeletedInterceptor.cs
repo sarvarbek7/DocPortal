@@ -18,11 +18,13 @@ internal sealed class SoftDeletedInterceptor : SaveChangesInterceptor
     {
       var entries =
         context.ChangeTracker.Entries<ISoftDeletedEntity>().ToList();
+
       foreach (var entiry in from EntityEntry<ISoftDeletedEntity> entiry in entries
                              where entiry.State is EntityState.Deleted
                              select entiry)
       {
         entiry.Property(nameof(ISoftDeletedEntity.IsDeleted)).CurrentValue = true;
+        entiry.State = EntityState.Modified;
       }
     }
 
