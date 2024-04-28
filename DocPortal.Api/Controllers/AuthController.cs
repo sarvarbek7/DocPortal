@@ -47,7 +47,7 @@ namespace DocPortal.Api.Controllers
     {
       try
       {
-        var details = mapper.Map<UpdateCredentialDetails>(request);
+        UpdateCredentialDetails? details = mapper.Map<UpdateCredentialDetails>(request);
 
         var errorOrUserCred =
           await authService.UpdateUserCredentialAsync(details);

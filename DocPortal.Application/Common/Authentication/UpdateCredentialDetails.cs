@@ -1,3 +1,3 @@
 ﻿namespace DocPortal.Application.Common.Authentication;
 
-public record UpdateCredentialDetails(int UserId, string Login, string Password);
+public record UpdateCredentialDetails(int Id, string Login, string Password);

@@ -113,7 +113,7 @@ internal class AuthService(IUserService userService,
     try
     {
       ErrorOr<UserCredential?> errorOrUserCredential =
-        await userCredentialService.RetrieveByIdAsync(details.UserId, false, cancellationToken);
+        await userCredentialService.RetrieveByIdAsync(details.Id, false, cancellationToken);
 
       if (errorOrUserCredential.IsError &&
         errorOrUserCredential.FirstError.Type is not ErrorType.NotFound)
@@ -127,7 +127,7 @@ internal class AuthService(IUserService userService,
 
       var userCredential = new UserCredential()
       {
-        Id = details.UserId,
+        Id = details.Id,
         Login = details.Login,
         Password = password,
       };
