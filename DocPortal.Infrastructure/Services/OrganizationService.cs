@@ -50,7 +50,8 @@ internal class OrganizationService(IOrganizationRepository repository, IValidato
   public new IEnumerable<Organization> RetrieveAll(PageOptions pageOptions,
                                                Expression<Func<Organization, bool>>? predicate = null,
                                                bool asNoTracking = false,
-                                               ICollection<string>? includedNavigationalProperties = null)
+                                               ICollection<string>? includedNavigationalProperties = null,
+                                               Func<IQueryable<Organization>, IOrderedQueryable<Organization>>? orderFunc = null)
     => base.RetrieveAll(pageOptions, predicate, asNoTracking, includedNavigationalProperties);
 
   public new async ValueTask<ErrorOr<Organization?>> RetrieveByIdAsync(int id,

@@ -14,4 +14,8 @@
     <ProjectReference Include="..\DocPortal.Domain\DocPortal.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+  </ItemGroup>
+
 </Project>

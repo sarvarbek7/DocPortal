@@ -11,13 +11,15 @@ internal sealed class DocumentEntityConfiguration : IEntityTypeConfiguration<Doc
   {
     builder.ToTable("documents");
 
-    builder.HasQueryFilter(document => document.IsDeleted);
+    builder.HasQueryFilter(document => !document.IsDeleted);
 
     builder.HasKey(entity => entity.Id);
 
     builder.HasIndex(entity => entity.RegisteredNumber);
 
-    builder.HasIndex(entity => entity.Title).IsUnique(false);
+    builder.HasIndex(entity => entity.Title);
+
+    builder.HasIndex(entity => entity.RegisteredDate);
 
     builder.Property(entity => entity.Id)
       .HasColumnName("id");

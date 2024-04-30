@@ -57,5 +57,24 @@ namespace DocPortal.Api.QueryServices
 
       return includedNavigationalProperties;
     }
+
+    public Func<IQueryable<Document>, IOrderedQueryable<Document>>? ApplyOrderbyQuery(string? orderby, bool isDescending = false)
+    {
+      if (orderby is null)
+      {
+        return q => q.OrderBy(document => document.CreatedAt);
+      }
+
+      return (orderby, isDescending) switch
+      {
+        ("title", false) => q => q.OrderBy(entity => entity.Title),
+        ("title", true) => q => q.OrderByDescending(entity => entity.Title),
+        ("registeredNumber", true) => q => q.OrderBy(entity => entity.RegisteredNumber),
+        ("registeredNumber", false) => q => q.OrderByDescending(entity => entity.RegisteredNumber),
+        ("registeredDate", true) => q => q.OrderBy(entity => entity.RegisteredDate),
+        ("registeredDate", false) => q => q.OrderByDescending(entity => entity.RegisteredDate),
+        _ => null
+      };
+    }
   }
 }

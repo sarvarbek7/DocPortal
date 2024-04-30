@@ -13,4 +13,6 @@ public interface IStatisticsService
   List<DocumentCountByOrganization> GetDocumentsCountGroupByOrganization(Expression<Func<Document, bool>>? predicate);
   int GetDocumentTypesCount();
   List<int> GetSubordinates(int id);
+  IEnumerable<DailyDocumentCount> GetDailyDocumentCount(int year);
+  List<MonthlyDocumentCount> GetMonthlyDocumentCount(int year);
 }

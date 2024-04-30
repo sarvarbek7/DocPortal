@@ -34,12 +34,14 @@ public class DocumentsController(IDocumentService documentService,
   [HttpGet]
   public IActionResult GetAllDocuments([FromQuery] int? limit,
                                        [FromQuery] int? page,
-                                       [FromQuery] string? title,
-                                       [FromQuery] string? registerNumber,
                                        [FromQuery] int? organizationId,
                                        [FromQuery] int? documentTypeId,
+                                       [FromQuery] string? title,
+                                       [FromQuery] string? registerNumber,
                                        [FromQuery] DateOnly? startDate,
                                        [FromQuery] DateOnly? endDate,
+                                       [FromQuery] string? orderby,
+                                       [FromQuery] bool isDescending = false,
                                        [FromQuery] bool includeDocumentType = false,
                                        [FromQuery] bool includeOrganization = false)
   {
@@ -48,6 +50,7 @@ public class DocumentsController(IDocumentService documentService,
       var pageOptions = new PageOptions(
         limit,
         page);
+
       var documentFilterOptions = new DocumentFilterOptions(title,
                                                             registerNumber,
                                                             organizationId,
@@ -66,8 +69,10 @@ public class DocumentsController(IDocumentService documentService,
       ICollection<string> includedNavigationalProperties =
         queryService.ApplyIncludeQueries(documentIncludeQueryOptions);
 
+      var orderFunc = queryService.ApplyOrderbyQuery(orderby, isDescending);
+
       var documents =
-        documentService.RetrieveAll(pageOptions, predicate, asNoTracking: false, includedNavigationalProperties);
+        documentService.RetrieveAll(pageOptions, predicate, asNoTracking: false, includedNavigationalProperties, orderFunc);
 
       return Ok(new GetAllDocumentsResponse(
         mapper.Map<IEnumerable<DocumentDto>>(documents),
@@ -107,7 +112,7 @@ public class DocumentsController(IDocumentService documentService,
 
   [AllowAnonymous]
   [HttpGet("types")]
-  public async ValueTask<IActionResult> GetDocumentTypes()
+  public IActionResult GetDocumentTypes()
   {
     try
     {
@@ -151,7 +156,7 @@ public class DocumentsController(IDocumentService documentService,
 
         var extension = Path.GetExtension(file.FileName);
 
-        var fileName = $"{Guid.NewGuid()}.{extension}";
+        var fileName = $"{Guid.NewGuid()}{extension}";
 
         Document document = new()
         {
@@ -195,4 +200,41 @@ public class DocumentsController(IDocumentService documentService,
   }
 
 
+  [HttpDelete("{id:guid:required}")]
+  public async ValueTask<IActionResult> DeleteDocumentById(Guid id)
+  {
+    try
+    {
+      var errorOrDeletedDocument =
+        await documentService.RemoveByIdAsync(id);
+
+      return errorOrDeletedDocument.Match(
+        value => Ok(mapper.Map<DocumentDto>(value)),
+        Problem);
+    }
+    catch
+    {
+      return Problem([Error.Unexpected()]);
+    }
+  }
+
+  [HttpPut]
+  public async ValueTask<IActionResult> UpdateDocument(DocumentDto document)
+  {
+    try
+    {
+      var documentFromDto = mapper.Map<Document>(document);
+
+      var errorOrUpdatedDocument =
+        await documentService.ModifyAsync(documentFromDto);
+
+      return errorOrUpdatedDocument.Match(
+        value => Ok(mapper.Map<DocumentDto>(value)),
+        Problem);
+    }
+    catch
+    {
+      return Problem([Error.Unexpected()]);
+    }
+  }
 }

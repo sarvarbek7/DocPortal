@@ -54,7 +54,36 @@ internal class DocumentService(IDocumentRepository repository, IValidator<Docume
   public new async ValueTask<ErrorOr<Document>> ModifyAsync(Document entity,
                                                   bool saveChanges = true,
                                                   CancellationToken cancellationToken = default)
-    => await base.ModifyAsync(entity, saveChanges, cancellationToken);
+  {
+    try
+    {
+      var errorOrdocument =
+      await base.RetrieveByIdAsync(entity.Id, cancellationToken: cancellationToken);
+
+      if (errorOrdocument.IsError)
+      {
+        return errorOrdocument.FirstError;
+      }
+
+      var document = errorOrdocument.Value;
+
+      document!.Title = entity.Title;
+      document.DocumentTypeId = entity.DocumentTypeId;
+      document.OrganizationId = entity.OrganizationId;
+      document.RegisteredNumber = entity.RegisteredNumber;
+      document.RegisteredDate = entity.RegisteredDate;
+      document.IsPrivate = entity.IsPrivate;
+      document.IsDeleted = false;
+
+      await base.SaveChangesAsync(cancellationToken);
+
+      return document;
+    }
+    catch
+    {
+      return Error.Unexpected();
+    }
+  }
 
   public new async ValueTask<ErrorOr<Document>> RemoveAsync(Document entity,
                                                       bool saveChanges = true,
@@ -69,8 +98,9 @@ internal class DocumentService(IDocumentRepository repository, IValidator<Docume
   public new IEnumerable<Document> RetrieveAll(PageOptions pageOptions,
                                                     Expression<Func<Document, bool>>? predicate = null,
                                                     bool asNoTracking = false,
-                                                    ICollection<string>? includedNavigationalProperties = null)
-    => base.RetrieveAll(pageOptions, predicate, asNoTracking, includedNavigationalProperties);
+                                                    ICollection<string>? includedNavigationalProperties = null,
+                                                    Func<IQueryable<Document>, IOrderedQueryable<Document>>? orderFunc = null)
+    => base.RetrieveAll(pageOptions, predicate, asNoTracking, includedNavigationalProperties, orderFunc);
 
   public new async ValueTask<ErrorOr<Document?>> RetrieveByIdAsync(Guid id,
                                                        bool asNoTracking = false,

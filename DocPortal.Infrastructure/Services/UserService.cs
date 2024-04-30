@@ -43,7 +43,8 @@ internal class UserService(IUserRepository repository, IValidator<User> validato
   public new IEnumerable<User> RetrieveAll(PageOptions pageOptions,
                                                     Expression<Func<User, bool>>? predicate = null,
                                                     bool asNoTracking = false,
-                                                    ICollection<string>? includedNavigationalProperties = null)
+                                                    ICollection<string>? includedNavigationalProperties = null,
+                                                    Func<IQueryable<User>, IOrderedQueryable<User>>? orderFunc = null)
     => base.RetrieveAll(pageOptions, predicate, asNoTracking, includedNavigationalProperties);
 
   public new async ValueTask<ErrorOr<User?>> RetrieveByIdAsync(int id,

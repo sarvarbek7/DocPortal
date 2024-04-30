@@ -145,11 +145,22 @@ internal abstract class CrudService<TEntity, TId>(
   public IEnumerable<TEntity> RetrieveAll(PageOptions pageOptions,
                                                     Expression<Func<TEntity, bool>>? predicate = null,
                                                     bool asNoTracking = false,
-                                                    ICollection<string>? includedNavigationalProperties = null)
+                                                    ICollection<string>? includedNavigationalProperties = null,
+                                                    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderFunc = null)
   {
     try
     {
       var initialQuery = repository.GetEntities(predicate, asNoTracking);
+
+      if (orderFunc is null)
+      {
+        initialQuery = initialQuery
+        .OrderBy(entity => entity.Id);
+      }
+      else
+      {
+        initialQuery = orderFunc(initialQuery);
+      }
 
       initialQuery = initialQuery
         .Skip((pageOptions.PageToken - 1) * pageOptions.PageSize)

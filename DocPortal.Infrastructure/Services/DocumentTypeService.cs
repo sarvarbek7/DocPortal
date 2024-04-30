@@ -38,7 +38,8 @@ internal class DocumentTypeService(IDocumentTypeRepository repository, IValidato
   public new IEnumerable<DocumentType> RetrieveAll(PageOptions pageOptions,
                                                     Expression<Func<DocumentType, bool>>? predicate = null,
                                                     bool asNoTracking = false,
-                                                    ICollection<string>? includedNavigationalProperties = null)
+                                                    ICollection<string>? includedNavigationalProperties = null,
+                                                    Func<IQueryable<DocumentType>, IOrderedQueryable<DocumentType>>? orderFunc = null)
   {
     return repository.GetEntities();
   }

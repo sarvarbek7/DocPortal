@@ -42,7 +42,8 @@ internal class UserOrganizationService(IUserOrganizationRepository repository, I
   public new IEnumerable<UserOrganization> RetrieveAll(PageOptions pageOptions,
                                                     Expression<Func<UserOrganization, bool>>? predicate = null,
                                                     bool asNoTracking = false,
-                                                    ICollection<string>? includedNavigationalProperties = null)
+                                                    ICollection<string>? includedNavigationalProperties = null,
+                                                    Func<IQueryable<UserOrganization>, IOrderedQueryable<UserOrganization>>? orderFunc = null)
     => base.RetrieveAll(pageOptions, predicate, asNoTracking, includedNavigationalProperties);
 
   public new async ValueTask<ErrorOr<UserOrganization?>> RetrieveByIdAsync(int id,

@@ -9,5 +9,6 @@ namespace DocPortal.Api.QueryServices
   {
     Expression<Func<TEntity, bool>>? ApplyFilterOptions(IFilterOptions<TEntity>? filterOptions);
     ICollection<string> ApplyIncludeQueries(IIncludeQueryOptions<TEntity>? includeQueryOptions);
+    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? ApplyOrderbyQuery(string? orderby, bool isDescending = false);
   }
 }

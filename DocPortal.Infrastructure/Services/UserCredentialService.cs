@@ -33,7 +33,11 @@ internal class UserCredentialService(IUserCredentialsRepository repository,
   public new async ValueTask<ErrorOr<UserCredential>> RemoveByIdAsync(int id, bool saveChanges = true, CancellationToken cancellationToken = default)
     => await base.RemoveByIdAsync(id, saveChanges, cancellationToken);
 
-  public new IEnumerable<UserCredential> RetrieveAll(PageOptions pageOptions, Expression<Func<UserCredential, bool>>? predicate = null, bool asNoTracking = false, ICollection<string>? includedNavigationalProperties = null)
+  public new IEnumerable<UserCredential> RetrieveAll(PageOptions pageOptions,
+                                                     Expression<Func<UserCredential, bool>>? predicate = null,
+                                                     bool asNoTracking = false,
+                                                     ICollection<string>? includedNavigationalProperties = null,
+                                                     Func<IQueryable<UserCredential>, IOrderedQueryable<UserCredential>>? orderFunc = null)
     => base.RetrieveAll(pageOptions, predicate);
 
   public new async ValueTask<ErrorOr<UserCredential?>> RetrieveByIdAsync(int id, bool asNoTracking = false, CancellationToken cancellationToken = default)

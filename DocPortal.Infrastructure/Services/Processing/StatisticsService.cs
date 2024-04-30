@@ -75,4 +75,34 @@ internal class StatisticsService(ApplicationDbContext dbContext) : IStatisticsSe
       .AsEnumerable()
       .Where(subId => subId != id).ToList();
   }
+
+  public IEnumerable<DailyDocumentCount> GetDailyDocumentCount(int year)
+  {
+    if (year == default)
+    {
+      year = DateTime.Now.Year;
+    }
+
+    var firstDayOfYear = new DateOnly(year, 1, 1);
+    var lastDayOfYear = new DateOnly(year, 12, 31);
+
+    return dbContext.Documents.Where(doc =>
+    doc.RegisteredDate > firstDayOfYear && doc.RegisteredDate < lastDayOfYear)
+      .GroupBy(doc => doc.RegisteredDate, (key, docs) =>
+      new DailyDocumentCount(key, docs.Count())).AsEnumerable();
+  }
+
+  public List<MonthlyDocumentCount> GetMonthlyDocumentCount(int year)
+  {
+    if (year == default)
+    {
+      year = DateTime.Now.Year;
+    }
+
+    var dailyDocumentCount = GetDailyDocumentCount(year);
+
+    return dailyDocumentCount.GroupBy(dailyDocCount =>
+      dailyDocCount.Day.Month, (key, docCounts) =>
+        new MonthlyDocumentCount(key, docCounts.Sum(doc => doc.Count))).ToList();
+  }
 }

@@ -56,4 +56,6 @@ internal class UserQueryService : IQueryService<User>
 
     return includedNavigationalProperties;
   }
+
+  public Func<IQueryable<User>, IOrderedQueryable<User>>? ApplyOrderbyQuery(string? orderby, bool isDescending = false) => throw new NotImplementedException();
 }

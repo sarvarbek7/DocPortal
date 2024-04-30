@@ -56,4 +56,6 @@ internal class OrganizationQueryService : IQueryService<Organization>
 
     return includedNavigationalProperties;
   }
+
+  public Func<IQueryable<Organization>, IOrderedQueryable<Organization>>? ApplyOrderbyQuery(string? orderby, bool isDescending = false) => throw new NotImplementedException();
 }
