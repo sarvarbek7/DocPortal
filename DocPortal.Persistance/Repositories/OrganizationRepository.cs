@@ -28,20 +28,10 @@ internal class OrganizationRepository(ApplicationDbContext context) :
                                                                       CancellationToken cancellationToken = default)
     => base.DeleteEntitiesAsync(entities, saveChanges, cancellationToken);
 
-  public new ValueTask<IEnumerable<Organization>> DeleteEntitiesByIdsAsync(IEnumerable<int> ids,
-                                                                           bool saveChanges = true,
-                                                                           CancellationToken cancellationToken = default)
-    => base.DeleteEntitiesByIdsAsync(ids, saveChanges, cancellationToken);
-
   public new ValueTask<Organization> DeleteEntityAsync(Organization entity,
                                                        bool saveChanges = true,
                                                        CancellationToken cancellationToken = default)
     => base.DeleteEntityAsync(entity, saveChanges, cancellationToken);
-
-  public new ValueTask<Organization> DeleteEntityByIdAsync(int id,
-                                                           bool saveChanges = true,
-                                                           CancellationToken cancellationToken = default)
-    => base.DeleteEntityByIdAsync(id, saveChanges, cancellationToken);
 
   public async ValueTask<bool> EntityExistsAsync(Expression<Func<Organization, bool>>? predicate = null, CancellationToken cancellationToken = default)
   {
@@ -55,9 +45,8 @@ internal class OrganizationRepository(ApplicationDbContext context) :
     => base.GetEntities(predicate, asNoTracking);
 
   public new ValueTask<Organization?> GetEntityByIdAsync(int id,
-                                                         bool asNoTracking = false,
                                                          CancellationToken cancellationToken = default)
-    => base.GetEntityByIdAsync(id, asNoTracking, cancellationToken);
+    => base.GetEntityByIdAsync(id, cancellationToken);
 
   public new ValueTask<Organization> UpdateAsync(Organization entity,
                                                  bool saveChanges = true,

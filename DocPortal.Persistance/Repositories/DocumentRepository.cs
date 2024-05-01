@@ -28,20 +28,10 @@ internal class DocumentRepository(ApplicationDbContext context) :
                                                                   CancellationToken cancellationToken = default)
     => base.DeleteEntitiesAsync(entities, saveChanges, cancellationToken);
 
-  public new ValueTask<IEnumerable<Document>> DeleteEntitiesByIdsAsync(IEnumerable<Guid> ids,
-                                                                       bool saveChanges = true,
-                                                                       CancellationToken cancellationToken = default)
-    => base.DeleteEntitiesByIdsAsync(ids, saveChanges, cancellationToken);
-
   public new ValueTask<Document> DeleteEntityAsync(Document entity,
                                                    bool saveChanges = true,
                                                    CancellationToken cancellationToken = default)
     => base.DeleteEntityAsync(entity, saveChanges, cancellationToken);
-
-  public new ValueTask<Document> DeleteEntityByIdAsync(Guid id,
-                                                       bool saveChanges = true,
-                                                       CancellationToken cancellationToken = default)
-    => base.DeleteEntityByIdAsync(id, saveChanges, cancellationToken);
 
   public async ValueTask<bool> EntityExistsAsync(Expression<Func<Document, bool>>? predicate = null, CancellationToken cancellationToken = default)
   {
@@ -54,9 +44,8 @@ internal class DocumentRepository(ApplicationDbContext context) :
     => base.GetEntities(predicate, asNoTracking);
 
   public new ValueTask<Document?> GetEntityByIdAsync(Guid id,
-                                                     bool asNoTracking = false,
                                                      CancellationToken cancellationToken = default)
-    => base.GetEntityByIdAsync(id, asNoTracking, cancellationToken);
+    => base.GetEntityByIdAsync(id, cancellationToken);
 
   public new ValueTask<Document> UpdateAsync(Document entity,
                                              bool saveChanges = true,

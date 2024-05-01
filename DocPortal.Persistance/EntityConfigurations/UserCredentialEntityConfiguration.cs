@@ -15,8 +15,13 @@ namespace DocPortal.Persistance.EntityConfigurations
 
       builder.HasIndex(credential => credential.Login).IsUnique();
 
+      //////////////////////////////////////////////////////////////////////
+
+      // IEntity
       builder.Property(entity => entity.Id)
         .HasColumnName("id");
+
+      //////////////////////////////////////////////////////////////////////
 
       builder.Property(credential => credential.Login)
       .HasMaxLength(127)

@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 
+using DocPortal.Api.Filters;
 using DocPortal.Api.QueryServices;
 using DocPortal.Application.Options;
 using DocPortal.Application.Services;
@@ -30,6 +31,18 @@ public class DocumentsController(IDocumentService documentService,
                                  IMapper mapper,
                                  IWebHostEnvironment environment) : _ApiController
 {
+  private readonly string[] _availableDocumentTypes =
+  [
+    ".doc",
+    ".docx",
+    ".xlsx",
+    ".xls",
+    ".pdf",
+    ".txt",
+    ".epub",
+    ".ppt"
+  ];
+
   [AllowAnonymous]
   [HttpGet]
   public IActionResult GetAllDocuments([FromQuery] int? limit,
@@ -116,10 +129,8 @@ public class DocumentsController(IDocumentService documentService,
   {
     try
     {
-      PageOptions pageOptions = null;
-
       var documentTypes =
-        documentTypeService.RetrieveAll(pageOptions);
+        documentTypeService.RetrieveAll(null);
 
       return Ok(new
       {
@@ -133,6 +144,7 @@ public class DocumentsController(IDocumentService documentService,
     }
   }
 
+  [AdminOrganizationAuthorize]
   [HttpPost]
   public async ValueTask<IActionResult> UploadDocuments([FromForm] UploadDocumentsRequest request)
   {
@@ -140,7 +152,8 @@ public class DocumentsController(IDocumentService documentService,
     {
       List<Document> documents = [];
 
-      string relativePath = Path.Combine("documents", request.OrganizationId.ToString().PadLeft(4, '0'));
+      string relativePath = Path.Combine("documents",
+        request.OrganizationId.ToString().PadLeft(4, '0'));
 
       Directory.CreateDirectory(Path.Combine(environment.ContentRootPath, relativePath));
 
@@ -155,6 +168,11 @@ public class DocumentsController(IDocumentService documentService,
         var documentDto = documentDtos[index++];
 
         var extension = Path.GetExtension(file.FileName);
+
+        if (!_availableDocumentTypes.Contains(extension))
+        {
+          return Problem([Error.Validation("Document.WrongType", extension)]);
+        }
 
         var fileName = $"{Guid.NewGuid()}{extension}";
 
@@ -199,7 +217,7 @@ public class DocumentsController(IDocumentService documentService,
     }
   }
 
-
+  [AdminOrganizationAuthorize]
   [HttpDelete("{id:guid:required}")]
   public async ValueTask<IActionResult> DeleteDocumentById(Guid id)
   {
@@ -218,6 +236,7 @@ public class DocumentsController(IDocumentService documentService,
     }
   }
 
+  [AdminOrganizationAuthorize]
   [HttpPut]
   public async ValueTask<IActionResult> UpdateDocument(DocumentDto document)
   {
@@ -234,6 +253,60 @@ public class DocumentsController(IDocumentService documentService,
     }
     catch
     {
+      return Problem([Error.Unexpected()]);
+    }
+  }
+
+  [AllowAnonymous]
+  [HttpGet("download")]
+  public async ValueTask<IActionResult> DownloadDocument([FromQuery] Guid id)
+  {
+    FileStream stream = null;
+
+    try
+    {
+      ErrorOr<Document?> errorOrStoredDocument =
+        await documentService.RetrieveByIdAsync(id);
+
+      if (errorOrStoredDocument.IsError)
+      {
+        return Problem(errorOrStoredDocument.Errors);
+      }
+
+      Document? storedDocument = errorOrStoredDocument.Value;
+
+      if (storedDocument is null || storedDocument.IsDeleted)
+      {
+        return NotFound();
+      }
+
+      if (storedDocument.IsPrivate)
+      {
+        return BadRequest("Maxfiy hujjat.");
+      }
+
+      var contentPath = environment.ContentRootPath;
+
+      var documentPath =
+        Path.Combine(contentPath, storedDocument.StoragePath);
+
+      if (!System.IO.File.Exists(documentPath))
+      {
+        return NotFound();
+      }
+
+      string extension = Path.GetExtension(storedDocument.StoragePath);
+
+      stream = new FileStream(documentPath,
+                              FileMode.Open,
+                              FileAccess.Read,
+                              FileShare.Read);
+
+      return File(stream, "application/octet-stream", fileDownloadName: Path.Combine(storedDocument.Title, extension));
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine(ex);
       return Problem([Error.Unexpected()]);
     }
   }

@@ -62,7 +62,7 @@ namespace DocPortal.Api.QueryServices
     {
       if (orderby is null)
       {
-        return q => q.OrderBy(document => document.CreatedAt);
+        return q => q.OrderByDescending(document => document.CreatedAt);
       }
 
       return (orderby, isDescending) switch

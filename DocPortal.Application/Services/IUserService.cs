@@ -7,7 +7,8 @@ namespace DocPortal.Application.Services;
 
 public interface IUserService : ICrudService<User, int>
 {
-  ValueTask<ErrorOr<User>> RetrieveUserByIdWithDetails(int id,
+  ValueTask<ErrorOr<User>> RetrieveUserByIdWithDetailsAsync(int id,
                                                        bool asNoTracking = false,
-                                                       ICollection<string>? includedNavigationalProperties = null);
+                                                       ICollection<string>? includedNavigationalProperties = null,
+                                                       CancellationToken cancellationToken = default);
 }

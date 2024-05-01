@@ -28,20 +28,10 @@ internal class UserRepository(ApplicationDbContext context) :
                                                               CancellationToken cancellationToken = default)
     => base.DeleteEntitiesAsync(entities, saveChanges, cancellationToken);
 
-  public new ValueTask<IEnumerable<User>> DeleteEntitiesByIdsAsync(IEnumerable<int> ids,
-                                                                   bool saveChanges = true,
-                                                                   CancellationToken cancellationToken = default)
-    => base.DeleteEntitiesByIdsAsync(ids, saveChanges, cancellationToken);
-
   public new ValueTask<User> DeleteEntityAsync(User entity,
                                                bool saveChanges = true,
                                                CancellationToken cancellationToken = default)
     => base.DeleteEntityAsync(entity, saveChanges, cancellationToken);
-
-  public new ValueTask<User> DeleteEntityByIdAsync(int id,
-                                                   bool saveChanges = true,
-                                                   CancellationToken cancellationToken = default)
-    => base.DeleteEntityByIdAsync(id, saveChanges, cancellationToken);
 
   public async ValueTask<bool> EntityExistsAsync(Expression<Func<User, bool>>? predicate = null, CancellationToken cancellationToken = default)
   {
@@ -55,9 +45,8 @@ internal class UserRepository(ApplicationDbContext context) :
     => base.GetEntities(predicate, asNoTracking);
 
   public new ValueTask<User?> GetEntityByIdAsync(int id,
-                                                 bool asNoTracking = false,
                                                  CancellationToken cancellationToken = default)
-    => base.GetEntityByIdAsync(id, asNoTracking, cancellationToken);
+    => base.GetEntityByIdAsync(id, cancellationToken);
 
   public new ValueTask<User> UpdateAsync(User entity,
                                          bool saveChanges = true,

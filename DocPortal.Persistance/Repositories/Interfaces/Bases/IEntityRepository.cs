@@ -9,6 +9,7 @@ namespace DocPortal.Persistance.Repositories.Interfaces.Bases
       where TId : struct
   {
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+
     ValueTask<bool> EntityExistsAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default);
   }
 }

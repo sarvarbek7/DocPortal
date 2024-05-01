@@ -7,4 +7,6 @@ public interface IEntity<TId> : IEntity
 }
 
 public interface IEntity
-{ }
+{
+  void UpdateEntityState(IEntity basedOnThisEntity);
+}

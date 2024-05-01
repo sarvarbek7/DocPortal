@@ -23,7 +23,7 @@ internal sealed class AuditableInterceptor : SaveChangesInterceptor
 
   private static void UpdateAuditableEntities(DbContext context)
   {
-    DateTime utcNow = DateTime.Now;
+    DateTime now = DateTime.Now;
     var entries = context.ChangeTracker.Entries<IAuditableEntity>().ToList();
 
     foreach (EntityEntry<IAuditableEntity> entry in entries)
@@ -31,15 +31,15 @@ internal sealed class AuditableInterceptor : SaveChangesInterceptor
       if (entry.State == EntityState.Added)
       {
         SetCurrentPropertyValue(
-            entry, nameof(IAuditableEntity.CreatedAt), utcNow);
+            entry, nameof(IAuditableEntity.CreatedAt), now);
         SetCurrentPropertyValue(
-            entry, nameof(IAuditableEntity.UpdatedAt), utcNow);
+            entry, nameof(IAuditableEntity.UpdatedAt), now);
       }
 
       if (entry.State == EntityState.Modified)
       {
         SetCurrentPropertyValue(
-            entry, nameof(IAuditableEntity.UpdatedAt), utcNow);
+            entry, nameof(IAuditableEntity.UpdatedAt), now);
       }
     }
 

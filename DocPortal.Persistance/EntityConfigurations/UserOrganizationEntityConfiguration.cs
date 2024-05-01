@@ -15,8 +15,13 @@ internal sealed class UserOrganizationEntityConfiguration : IEntityTypeConfigura
 
     builder.HasIndex(userOrganization => userOrganization.UserId).IsUnique(false);
 
-    builder.Property(userOrganization => userOrganization.Id)
+    //////////////////////////////////////////////////////////////////////
+
+    // IEntity
+    builder.Property(entity => entity.Id)
       .HasColumnName("id");
+
+    //////////////////////////////////////////////////////////////////////
 
     builder.Property(userOrganization => userOrganization.UserId)
       .HasColumnName("user_id");

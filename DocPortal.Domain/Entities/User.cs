@@ -22,4 +22,22 @@ public sealed class User : Entity<int, int>
   }
   public UserCredential? UserCredential { get; set; }
   public ICollection<UserOrganization>? UserOrganizations { get; set; }
+
+  public override void UpdateEntityState(IEntity basedOnThisEntity)
+  {
+    if (basedOnThisEntity is not User)
+    {
+      throw new InvalidOperationException();
+    }
+    else
+    {
+      User user = (basedOnThisEntity as User)!;
+
+      this.PhysicalIdentity = user.PhysicalIdentity;
+      this.FirstName = user.FirstName;
+      this.LastName = user.LastName;
+      this.JobPosition = user.JobPosition;
+      this.Role = user.Role;
+    }
+  }
 }

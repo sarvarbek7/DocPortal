@@ -13,8 +13,13 @@ internal sealed class DocumentTypeEntityConfiguration : IEntityTypeConfiguration
 
     builder.HasKey(docType => docType.Id);
 
-    builder.Property(docType => docType.Id)
+    //////////////////////////////////////////////////////////////////////
+
+    // IEntity
+    builder.Property(entity => entity.Id)
       .HasColumnName("id");
+
+    //////////////////////////////////////////////////////////////////////
 
     builder.Property(docType => docType.Title)
       .HasMaxLength(1023)

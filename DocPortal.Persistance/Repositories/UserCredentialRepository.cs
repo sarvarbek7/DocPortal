@@ -18,9 +18,6 @@ internal class UserCredentialRepository(ApplicationDbContext dbContext) :
   public new async ValueTask<UserCredential> DeleteEntityAsync(UserCredential entity, bool saveChanges = true, CancellationToken cancellationToken = default)
     => await base.DeleteEntityAsync(entity);
 
-  public new async ValueTask<UserCredential> DeleteEntityByIdAsync(int id, bool saveChanges = true, CancellationToken cancellationToken = default)
-    => await base.DeleteEntityByIdAsync(id, saveChanges, cancellationToken);
-
   public async ValueTask<bool> EntityExistsAsync(Expression<Func<UserCredential, bool>>? predicate = null, CancellationToken cancellationToken = default)
   {
     return predicate is null
@@ -31,8 +28,9 @@ internal class UserCredentialRepository(ApplicationDbContext dbContext) :
   public new IQueryable<UserCredential> GetEntities(Expression<Func<UserCredential, bool>>? predicate = null, bool asNoTracking = false)
     => base.GetEntities(predicate, asNoTracking);
 
-  public new async ValueTask<UserCredential?> GetEntityByIdAsync(int id, bool asNoTracking = false, CancellationToken cancellationToken = default)
-    => await base.GetEntityByIdAsync(id, asNoTracking, cancellationToken);
+  public new async ValueTask<UserCredential?> GetEntityByIdAsync(int id,
+                                                                 CancellationToken cancellationToken = default)
+    => await base.GetEntityByIdAsync(id, cancellationToken);
 
   public new async ValueTask<UserCredential> UpdateAsync(UserCredential entity, bool saveChanges = true, CancellationToken cancellationToken = default)
     => await base.UpdateAsync(entity, saveChanges, cancellationToken);

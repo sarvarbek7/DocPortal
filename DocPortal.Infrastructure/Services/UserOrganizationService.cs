@@ -47,9 +47,8 @@ internal class UserOrganizationService(IUserOrganizationRepository repository, I
     => base.RetrieveAll(pageOptions, predicate, asNoTracking, includedNavigationalProperties);
 
   public new async ValueTask<ErrorOr<UserOrganization?>> RetrieveByIdAsync(int id,
-                                                       bool asNoTracking = false,
                                                        CancellationToken cancellationToken = default)
-    => await base.RetrieveByIdAsync(id, asNoTracking, cancellationToken);
+    => await base.RetrieveByIdAsync(id, cancellationToken);
 
   public async ValueTask<IEnumerable<UserOrganization>> AddMultipleUserOrganizationsAsync(IEnumerable<UserOrganization> userOrganizations,
                                                                                      bool saveChanges = true,

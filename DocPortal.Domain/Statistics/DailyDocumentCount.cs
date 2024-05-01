@@ -1,4 +1,4 @@
 ﻿namespace DocPortal.Domain.Statistics;
 
-public record DailyDocumentCount(DateOnly Day, int Count);
+public record DailyDocumentCount(DateOnly Day, int DocumentTypeId, int Count);
 

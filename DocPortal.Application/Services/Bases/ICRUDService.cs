@@ -18,7 +18,6 @@ public interface ICrudService<TEntity, TId>
                                    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderFunc = null);
 
   ValueTask<ErrorOr<TEntity?>> RetrieveByIdAsync(TId id,
-                                         bool asNoTracking = false,
                                          CancellationToken cancellationToken = default);
 
   ValueTask<ErrorOr<TEntity>> AddEntityAsync(TEntity entity,

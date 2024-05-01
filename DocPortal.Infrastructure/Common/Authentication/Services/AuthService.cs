@@ -34,7 +34,10 @@ internal class AuthService(IUserService userService,
         return AuthenticationError.InvalidCredentials;
       }
 
-      var user = await userService.RetrieveByIdAsync(userCredential.Id, cancellationToken: cancellationToken);
+      var user = await userService.RetrieveUserByIdWithDetailsAsync(userCredential.Id,
+                                                                    false,
+                                                                    [nameof(User.UserOrganizations)],
+                                                                    cancellationToken);
 
       if (user.IsError)
       {
@@ -113,7 +116,7 @@ internal class AuthService(IUserService userService,
     try
     {
       ErrorOr<UserCredential?> errorOrUserCredential =
-        await userCredentialService.RetrieveByIdAsync(details.Id, false, cancellationToken);
+        await userCredentialService.RetrieveByIdAsync(details.Id, cancellationToken);
 
       if (errorOrUserCredential.IsError &&
         errorOrUserCredential.FirstError.Type is not ErrorType.NotFound)

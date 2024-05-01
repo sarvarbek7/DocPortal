@@ -21,25 +21,39 @@ internal sealed class DocumentEntityConfiguration : IEntityTypeConfiguration<Doc
 
     builder.HasIndex(entity => entity.RegisteredDate);
 
+    //////////////////////////////////////////////////////////////////////
+
+    // IEntity
     builder.Property(entity => entity.Id)
       .HasColumnName("id");
 
-    builder.Property(entity => entity.CreatedBy)
+    // IAuditableEntity
+    builder.Property(auditableEntity => auditableEntity.CreatedBy)
       .HasColumnName("created_by");
 
-    builder.Property(entity => entity.UpdatedBy)
+    builder.Property(auditableEntity => auditableEntity.UpdatedBy)
       .HasColumnName("updated_by");
 
-    builder.Property(entity => entity.CreatedAt)
+    builder.Property(auditableEntity => auditableEntity.CreatedAt)
       .HasColumnType("timestamp")
       .HasColumnName("created_at");
 
-    builder.Property(entity => entity.UpdatedAt)
+    builder.Property(auditableEntity => auditableEntity.UpdatedAt)
       .HasColumnType("timestamp")
       .HasColumnName("updated_at");
 
-    builder.Property(entity => entity.IsDeleted)
+    // ISoftDeletedEntity
+    builder.Property(softDeletedEntity => softDeletedEntity.IsDeleted)
       .HasColumnName("is_deleted");
+
+    builder.Property(softDeletedEntity => softDeletedEntity.DeletedBy)
+      .HasColumnName("deleted_by");
+
+    builder.Property(softDeletedEntity => softDeletedEntity.DeletedAt)
+      .HasColumnType("timestamp")
+      .HasColumnName("deleted_at");
+
+    //////////////////////////////////////////////////////////////////////
 
     builder.Property(entity => entity.Title)
       .HasMaxLength(1023)

@@ -46,23 +46,9 @@ internal abstract class EntityRepositoryBase<TContext, TEntity, TId>(TContext co
   /// <param name="cancellationToken"></param>
   /// <returns></returns>
   protected async ValueTask<TEntity?> GetEntityByIdAsync(TId id,
-                                                         bool asNoTracking = false,
                                                          CancellationToken cancellationToken = default)
   {
-    var foundEntity = default(TEntity?);
-
-    var initialQuery = DbContext.Set<TEntity>().AsQueryable();
-
-    if (asNoTracking)
-    {
-      initialQuery = initialQuery.AsNoTracking();
-    }
-
-    foundEntity =
-      await initialQuery.FirstOrDefaultAsync(
-        entity => entity.Id!.Equals(id), cancellationToken);
-
-    return foundEntity;
+    return await this.DbContext.Set<TEntity>().FindAsync(keyValues: [id], cancellationToken);
   }
 
   /// <summary>
@@ -140,11 +126,6 @@ internal abstract class EntityRepositoryBase<TContext, TEntity, TId>(TContext co
                                                  bool saveChanges = true,
                                                  CancellationToken cancellationToken = default)
   {
-    if (entity is null)
-    {
-      throw new InvalidOperationException("Entity can not null");
-    }
-
     DbContext.Set<TEntity>().Remove(entity);
 
     if (saveChanges)
@@ -155,22 +136,6 @@ internal abstract class EntityRepositoryBase<TContext, TEntity, TId>(TContext co
     return entity;
   }
 
-  /// <summary>
-  /// Delete entity by id
-  /// </summary>
-  /// <param name="id"></param>
-  /// <param name="saveChanges"></param>
-  /// <param name="cancellationToken"></param>
-  /// <returns></returns>
-  protected async ValueTask<TEntity> DeleteEntityByIdAsync(TId id,
-                                                     bool saveChanges = true,
-                                                     CancellationToken cancellationToken = default)
-  {
-    var foundEntity =
-      await GetEntityByIdAsync(id: id, cancellationToken: cancellationToken);
-
-    return await DeleteEntityAsync(foundEntity, saveChanges, cancellationToken);
-  }
 
   /// <summary>
   /// Delete multiple entities
@@ -183,10 +148,6 @@ internal abstract class EntityRepositoryBase<TContext, TEntity, TId>(TContext co
                                                                            bool saveChanges = true,
                                                                            CancellationToken cancellationToken = default)
   {
-    if (entities is null)
-    {
-      throw new InvalidOperationException("Entities can not be null");
-    }
     DbContext.Set<TEntity>().RemoveRange(entities);
 
     if (saveChanges)
@@ -195,25 +156,6 @@ internal abstract class EntityRepositoryBase<TContext, TEntity, TId>(TContext co
     }
 
     return entities;
-  }
-
-  /// <summary>
-  /// Delete multiple entities by ids
-  /// </summary>
-  /// <param name="ids"></param>
-  /// <param name="saveChanges"></param>
-  /// <param name="cancellationToken"></param>
-  /// <returns></returns>
-  protected async ValueTask<IEnumerable<TEntity>> DeleteEntitiesByIdsAsync(IEnumerable<TId> ids,
-                                                                           bool saveChanges = true,
-                                                                           CancellationToken cancellationToken = default)
-  {
-    Expression<Func<TEntity, bool>> findByIds =
-      (entity) => ids.Contains(entity.Id);
-
-    IQueryable<TEntity>? foundEntities = GetEntities(findByIds);
-
-    return await DeleteEntitiesAsync(foundEntities, saveChanges, cancellationToken);
   }
 
   public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

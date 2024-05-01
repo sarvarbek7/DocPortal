@@ -62,10 +62,12 @@ internal abstract class CrudService<TEntity, TId>(
   {
     try
     {
-      if (!await repository.EntityExistsAsync((ent) => ent.Id.Equals(entity.Id)))
+      ErrorOr<TEntity?> errorOrStoredEntity =
+        await this.RetrieveByIdAsync(entity.Id);
+
+      if (errorOrStoredEntity.IsError)
       {
-        return Error.NotFound(code: $"{typeof(TEntity).Name}.NotFound",
-          description: $"{typeof(TEntity).Name} with id {entity.Id} is not exists.");
+        return errorOrStoredEntity.FirstError;
       }
 
       var validationResult =
@@ -80,7 +82,12 @@ internal abstract class CrudService<TEntity, TId>(
         return errors;
       }
 
-      return await repository.UpdateAsync(entity, saveChanges, cancellationToken);
+      TEntity storedEntity = errorOrStoredEntity.Value!;
+      storedEntity.UpdateEntityState(entity);
+
+      await SaveChangesAsync(cancellationToken);
+
+      return storedEntity;
     }
     catch (Exception ex)
     {
@@ -121,8 +128,8 @@ internal abstract class CrudService<TEntity, TId>(
   }
 
   public async ValueTask<ErrorOr<TEntity>> RemoveByIdAsync(TId id,
-                                                            bool saveChanges = true,
-                                                            CancellationToken cancellationToken = default)
+                                                           bool saveChanges = true,
+                                                           CancellationToken cancellationToken = default)
   {
     try
     {
@@ -132,9 +139,17 @@ internal abstract class CrudService<TEntity, TId>(
           description: $"Modified {typeof(TEntity).Name} with id {id} is not exists.");
       }
 
-      var entity = await repository.DeleteEntityByIdAsync(id, saveChanges, cancellationToken);
+      var errorOrEntity = await this.RetrieveByIdAsync(id, cancellationToken);
 
-      return entity;
+      if (errorOrEntity.IsError)
+      {
+        return errorOrEntity.FirstError;
+      }
+
+      var deletedEntity =
+        await repository.DeleteEntityAsync(errorOrEntity.Value!, saveChanges, cancellationToken);
+
+      return deletedEntity;
     }
     catch (Exception ex)
     {
@@ -179,17 +194,16 @@ internal abstract class CrudService<TEntity, TId>(
   }
 
   public async ValueTask<ErrorOr<TEntity?>> RetrieveByIdAsync(TId id,
-                                                         bool asNoTracking = false,
-                                                         CancellationToken cancellationToken = default)
+                                                              CancellationToken cancellationToken = default)
   {
     try
     {
       var entity =
-        await repository.GetEntityByIdAsync(id, asNoTracking, cancellationToken);
+        await repository.GetEntityByIdAsync(id, cancellationToken);
 
       return entity is null
         ? Error.NotFound(code: $"{typeof(TEntity).Name}.NotFound",
-          description: $"Modified {typeof(TEntity).Name} with id {id} is not exists.")
+          description: $"{typeof(TEntity).Name} with id {id} is not exists.")
         : entity;
     }
     catch (Exception ex)

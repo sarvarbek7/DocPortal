@@ -40,8 +40,9 @@ internal class UserCredentialService(IUserCredentialsRepository repository,
                                                      Func<IQueryable<UserCredential>, IOrderedQueryable<UserCredential>>? orderFunc = null)
     => base.RetrieveAll(pageOptions, predicate);
 
-  public new async ValueTask<ErrorOr<UserCredential?>> RetrieveByIdAsync(int id, bool asNoTracking = false, CancellationToken cancellationToken = default)
-    => await base.RetrieveByIdAsync(id, asNoTracking, cancellationToken);
+  public new async ValueTask<ErrorOr<UserCredential?>> RetrieveByIdAsync(int id,
+                                                                         CancellationToken cancellationToken = default)
+    => await base.RetrieveByIdAsync(id, cancellationToken);
 
   public async ValueTask<ErrorOr<UserCredential>> RetrieveUserCredentialByLoginAsync(string login, CancellationToken cancellationToken = default)
   {

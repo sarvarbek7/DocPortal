@@ -75,6 +75,9 @@ internal class DocumentService(IDocumentRepository repository, IValidator<Docume
       document.IsPrivate = entity.IsPrivate;
       document.IsDeleted = false;
 
+      // Can I do this instead of example above
+      // document.UpdateEntity(entity);
+
       await base.SaveChangesAsync(cancellationToken);
 
       return document;
@@ -103,7 +106,6 @@ internal class DocumentService(IDocumentRepository repository, IValidator<Docume
     => base.RetrieveAll(pageOptions, predicate, asNoTracking, includedNavigationalProperties, orderFunc);
 
   public new async ValueTask<ErrorOr<Document?>> RetrieveByIdAsync(Guid id,
-                                                       bool asNoTracking = false,
                                                        CancellationToken cancellationToken = default)
-    => await base.RetrieveByIdAsync(id, asNoTracking, cancellationToken);
+    => await base.RetrieveByIdAsync(id, cancellationToken);
 }

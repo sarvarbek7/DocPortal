@@ -48,11 +48,13 @@ internal class UserService(IUserRepository repository, IValidator<User> validato
     => base.RetrieveAll(pageOptions, predicate, asNoTracking, includedNavigationalProperties);
 
   public new async ValueTask<ErrorOr<User?>> RetrieveByIdAsync(int id,
-                                                       bool asNoTracking = false,
                                                        CancellationToken cancellationToken = default)
-    => await base.RetrieveByIdAsync(id, asNoTracking, cancellationToken);
+    => await base.RetrieveByIdAsync(id, cancellationToken);
 
-  public async ValueTask<ErrorOr<User>> RetrieveUserByIdWithDetails(int id, bool asNoTracking = false, ICollection<string>? includedNavigationalProperties = null)
+  public async ValueTask<ErrorOr<User>> RetrieveUserByIdWithDetailsAsync(int id,
+                                                                         bool asNoTracking = false,
+                                                                         ICollection<string>? includedNavigationalProperties = null,
+                                                                         CancellationToken cancellationToken = default)
   {
     try
     {
@@ -68,7 +70,7 @@ internal class UserService(IUserRepository repository, IValidator<User> validato
       initialQuery =
         initialQuery.ApplyIncludedNavigations(includedNavigationalProperties);
 
-      var storedUser = await initialQuery.FirstOrDefaultAsync();
+      var storedUser = await initialQuery.FirstOrDefaultAsync(cancellationToken);
 
       if (storedUser is null)
       {

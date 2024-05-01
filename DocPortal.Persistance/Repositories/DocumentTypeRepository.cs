@@ -23,11 +23,6 @@ internal class DocumentTypeRepository(ApplicationDbContext context) :
                                                        CancellationToken cancellationToken = default)
     => base.DeleteEntityAsync(entity, saveChanges, cancellationToken);
 
-  public new ValueTask<DocumentType> DeleteEntityByIdAsync(int id,
-                                                           bool saveChanges = true,
-                                                           CancellationToken cancellationToken = default)
-    => base.DeleteEntityByIdAsync(id, saveChanges, cancellationToken);
-
   public async ValueTask<bool> EntityExistsAsync(Expression<Func<DocumentType, bool>>? predicate = null, CancellationToken cancellationToken = default)
   {
     return predicate is null
@@ -40,9 +35,8 @@ internal class DocumentTypeRepository(ApplicationDbContext context) :
     => base.GetEntities(predicate, asNoTracking);
 
   public new ValueTask<DocumentType?> GetEntityByIdAsync(int id,
-                                                         bool asNoTracking = false,
                                                          CancellationToken cancellationToken = default)
-    => base.GetEntityByIdAsync(id, asNoTracking, cancellationToken);
+    => base.GetEntityByIdAsync(id, cancellationToken);
 
   public new ValueTask<DocumentType> UpdateAsync(DocumentType entity,
                                                  bool saveChanges = true,

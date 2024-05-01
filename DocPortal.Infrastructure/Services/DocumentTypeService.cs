@@ -45,8 +45,7 @@ internal class DocumentTypeService(IDocumentTypeRepository repository, IValidato
   }
 
   public new async ValueTask<ErrorOr<DocumentType?>> RetrieveByIdAsync(int id,
-                                                       bool asNoTracking = false,
                                                        CancellationToken cancellationToken = default)
-    => await base.RetrieveByIdAsync(id, asNoTracking, cancellationToken);
+    => await base.RetrieveByIdAsync(id, cancellationToken);
 
 }

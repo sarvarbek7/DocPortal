@@ -12,4 +12,21 @@ public sealed class Organization : Entity<int, int>
   public ICollection<Organization>? Subordinates { get; set; }
   public ICollection<UserOrganization>? Admins { get; set; }
   public ICollection<Document>? Documents { get; set; }
+
+  public override void UpdateEntityState(IEntity basedOnThisEntity)
+  {
+    if (basedOnThisEntity is not Organization)
+    {
+      throw new InvalidOperationException();
+    }
+    else
+    {
+      Organization organization = (basedOnThisEntity as Organization)!;
+
+      this.Title = organization.Title;
+      this.PrimaryOrganizationId = organization.PrimaryOrganizationId;
+      this.PhysicalIdentity = organization.PhysicalIdentity;
+      this.Details = organization.Details;
+    }
+  }
 }

@@ -55,9 +55,8 @@ internal class OrganizationService(IOrganizationRepository repository, IValidato
     => base.RetrieveAll(pageOptions, predicate, asNoTracking, includedNavigationalProperties);
 
   public new async ValueTask<ErrorOr<Organization?>> RetrieveByIdAsync(int id,
-                                                       bool asNoTracking = false,
                                                        CancellationToken cancellationToken = default)
-    => await base.RetrieveByIdAsync(id, asNoTracking, cancellationToken);
+    => await base.RetrieveByIdAsync(id, cancellationToken);
 
   public async ValueTask<ErrorOr<Organization>> RetrieveOrganizationByIdWithDetails(int id,
                                                          bool asNoTracking = false,

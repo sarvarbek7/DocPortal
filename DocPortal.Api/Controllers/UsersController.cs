@@ -73,7 +73,7 @@ public class UsersController(IUserService userService,
       queryService.ApplyIncludeQueries(queryOptions);
 
       ErrorOr<User> storedUserOrError =
-        await userService.RetrieveUserByIdWithDetails(id, false, includedProperties);
+        await userService.RetrieveUserByIdWithDetailsAsync(id, false, includedProperties);
 
       return storedUserOrError.Match(
         onValue: value => Ok(new GetUserByIdResponse(
@@ -209,7 +209,7 @@ public class UsersController(IUserService userService,
     try
     {
       var errorOrUser =
-        await userService.RetrieveUserByIdWithDetails(id, false, [nameof(Domain.Entities.User.UserOrganizations)]);
+        await userService.RetrieveUserByIdWithDetailsAsync(id, false, [nameof(Domain.Entities.User.UserOrganizations)]);
 
       if (errorOrUser.IsError)
       {

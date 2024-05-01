@@ -22,4 +22,8 @@
     <ProjectReference Include="..\DocPortal.Infrastructure\DocPortal.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="documents\" />
+  </ItemGroup>
+
 </Project>
