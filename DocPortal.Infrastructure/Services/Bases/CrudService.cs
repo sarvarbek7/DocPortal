@@ -161,11 +161,15 @@ internal abstract class CrudService<TEntity, TId>(
                                                     Expression<Func<TEntity, bool>>? predicate = null,
                                                     bool asNoTracking = false,
                                                     ICollection<string>? includedNavigationalProperties = null,
-                                                    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderFunc = null)
+                                                    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderFunc = null,
+                                                    bool ignorePagination = false)
   {
     try
     {
-      var initialQuery = repository.GetEntities(predicate, asNoTracking);
+      var initialQuery =
+        repository.GetEntities(predicate, asNoTracking);
+
+      pageOptions ??= new PageOptions(null, null);
 
       if (orderFunc is null)
       {
@@ -177,9 +181,12 @@ internal abstract class CrudService<TEntity, TId>(
         initialQuery = orderFunc(initialQuery);
       }
 
-      initialQuery = initialQuery
+      if (!ignorePagination)
+      {
+        initialQuery = initialQuery
         .Skip((pageOptions.PageToken - 1) * pageOptions.PageSize)
         .Take(pageOptions.PageSize);
+      }
 
       initialQuery =
         initialQuery.ApplyIncludedNavigations(includedNavigationalProperties);

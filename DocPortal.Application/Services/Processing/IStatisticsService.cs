@@ -11,6 +11,7 @@ public interface IStatisticsService
   int GetUsersCount(Expression<Func<User, bool>>? predicate);
   int GetDocumentsCount(Expression<Func<Document, bool>>? predicate);
   List<DocumentCountByOrganization> GetDocumentsCountGroupByOrganization(Expression<Func<Document, bool>>? predicate);
+  List<DocumentCountByOrgAndDoctype> GetDocumentCountByOrgAndDoctype(Expression<Func<Document, bool>>? predicate);
   int GetDocumentTypesCount();
   List<int> GetSubordinates(int id);
   IEnumerable<DailyDocumentCount> GetDailyDocumentCount(int year);

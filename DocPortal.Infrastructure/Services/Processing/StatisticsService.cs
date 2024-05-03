@@ -87,7 +87,7 @@ internal class StatisticsService(ApplicationDbContext dbContext) : IStatisticsSe
     var lastDayOfYear = new DateOnly(year, 12, 31);
 
     return dbContext.Documents.Where(doc =>
-    doc.RegisteredDate > firstDayOfYear && doc.RegisteredDate < lastDayOfYear)
+    doc.RegisteredDate >= firstDayOfYear && doc.RegisteredDate <= lastDayOfYear)
       .GroupBy(doc => new { doc.RegisteredDate, doc.DocumentTypeId }, (key, docs) =>
       new DailyDocumentCount(key.RegisteredDate, key.DocumentTypeId, docs.Count())).AsEnumerable();
   }
@@ -104,5 +104,22 @@ internal class StatisticsService(ApplicationDbContext dbContext) : IStatisticsSe
     return dailyDocumentCount.GroupBy(dailyDocCount =>
       new { dailyDocCount.Day.Month, dailyDocCount.DocumentTypeId }, (key, docCounts) =>
         new MonthlyDocumentCount(key.Month, key.DocumentTypeId, docCounts.Sum(doc => doc.Count))).ToList();
+  }
+
+  public List<DocumentCountByOrgAndDoctype> GetDocumentCountByOrgAndDoctype(Expression<Func<Document, bool>>? predicate)
+  {
+    var initialQuery = dbContext.Documents.AsQueryable();
+
+    if (predicate is not null)
+    {
+      initialQuery = initialQuery.Where(predicate);
+    }
+
+    var documentCountByOrgAndDocType = initialQuery.GroupBy(
+      keySelector: document => new { document.OrganizationId, document.DocumentTypeId },
+      resultSelector: (key, documents) =>
+        new DocumentCountByOrgAndDoctype(key.OrganizationId, key.DocumentTypeId, documents.Count())).ToList();
+
+    return documentCountByOrgAndDocType;
   }
 }

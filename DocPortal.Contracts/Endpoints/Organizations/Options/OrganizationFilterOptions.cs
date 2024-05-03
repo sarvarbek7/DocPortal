@@ -3,6 +3,6 @@
 namespace DocPortal.Contracts.Endpoints.Organizations.Options;
 
 public record OrganizationFilterOptions(
-  string? Title,
+  string? Keyword,
   int? ParentId) : IFilterOptions<Organization>;
 

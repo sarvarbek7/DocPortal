@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 
+using DocPortal.Api.Http;
 using DocPortal.Api.QueryServices;
 using DocPortal.Application.Options;
 using DocPortal.Application.Services;
@@ -31,20 +32,27 @@ public class UsersController(IUserService userService,
 {
   [AllowAnonymous]
   [HttpGet]
-  public IActionResult GetAllUsers([FromQuery] int? limit, [FromQuery] int? page, string? keyword)
+  public IActionResult GetAllUsers([FromQuery] int? limit,
+                                   [FromQuery] int? page,
+                                   [FromQuery] string? keyword,
+                                   [FromQuery] string? orderby,
+                                   [FromQuery] bool isDescending = false)
   {
     try
     {
       var pageOptions = new PageOptions(limit, page);
 
-      var filterOptions = new UserFilterOptions(keyword, keyword, keyword, keyword);
+      var filterOptions = new UserFilterOptions(keyword);
 
       var predicate =
         queryService.ApplyFilterOptions(filterOptions);
 
+      var orderFunc =
+        queryService.ApplyOrderbyQuery(orderby, isDescending);
+
       var storedUsers = userService.RetrieveAll(pageOptions,
                                       predicate,
-                                      asNoTracking: false);
+                                      orderFunc: orderFunc);
 
       var userDtos =
         mapper.Map<IEnumerable<UserDto>>(storedUsers);
@@ -148,6 +156,15 @@ public class UsersController(IUserService userService,
     try
     {
       var user = mapper.Map<User>(request);
+
+      var httpUserId =
+              HttpContextService.GetUserId(HttpContext);
+
+      if (int.TryParse(httpUserId, out int adminId))
+      {
+        user.CreatedBy = adminId;
+        user.UpdatedBy = adminId;
+      }
 
       var createdUserOrError =
         await userService.AddEntityAsync(user);

@@ -12,10 +12,7 @@ internal class UserQueryService : IQueryService<User>
   {
     var filter = filterOptions as UserFilterOptions;
 
-    string? firstname = filter?.Firstname?.ToLower();
-    string? lastname = filter?.Lastname?.ToLower();
-    string? jobPosition = filter?.JobPosition?.ToLower();
-    string? role = filter?.Role?.ToLower();
+    string? keyword = filter?.Keyword?.ToLower();
 
     Expression<Func<User, bool>>? predicate = null;
 
@@ -25,10 +22,11 @@ internal class UserQueryService : IQueryService<User>
     }
 
     predicate = (user) =>
-      (firstname == null || user.FirstName.ToLower().Contains(firstname)) &&
-      (lastname == null || user.LastName.ToLower().Contains(lastname)) &&
-      (jobPosition == null || user.JobPosition.ToLower().Contains(jobPosition)) &&
-      (role == null || user.Role.ToLower().Contains(role));
+      (keyword == null || user.FirstName.ToLower().Contains(keyword)) ||
+      (keyword == null || user.LastName.ToLower().Contains(keyword)) ||
+      (keyword == null || user.PhysicalIdentity.ToLower().Contains(keyword)) ||
+      (keyword == null || user.JobPosition.ToLower().Contains(keyword)) ||
+      (keyword == null || user.Role.ToLower().Contains(keyword));
 
     return predicate;
   }
@@ -59,6 +57,18 @@ internal class UserQueryService : IQueryService<User>
 
   public Func<IQueryable<User>, IOrderedQueryable<User>>? ApplyOrderbyQuery(string? orderby, bool isDescending = false)
   {
+    if (orderby is null)
+    {
+      return null;
+    }
 
+    return (orderby, isDescending) switch
+    {
+      ("firstName", false) => q => q.OrderBy(user => user.FirstName),
+      ("firstName", true) => q => q.OrderByDescending(user => user.FirstName),
+      ("lastName", false) => q => q.OrderBy(user => user.LastName),
+      ("lastName", true) => q => q.OrderByDescending(user => user.LastName),
+      _ => null
+    };
   }
 }

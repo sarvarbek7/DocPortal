@@ -54,39 +54,7 @@ internal class DocumentService(IDocumentRepository repository, IValidator<Docume
   public new async ValueTask<ErrorOr<Document>> ModifyAsync(Document entity,
                                                   bool saveChanges = true,
                                                   CancellationToken cancellationToken = default)
-  {
-    try
-    {
-      var errorOrdocument =
-      await base.RetrieveByIdAsync(entity.Id, cancellationToken: cancellationToken);
-
-      if (errorOrdocument.IsError)
-      {
-        return errorOrdocument.FirstError;
-      }
-
-      var document = errorOrdocument.Value;
-
-      document!.Title = entity.Title;
-      document.DocumentTypeId = entity.DocumentTypeId;
-      document.OrganizationId = entity.OrganizationId;
-      document.RegisteredNumber = entity.RegisteredNumber;
-      document.RegisteredDate = entity.RegisteredDate;
-      document.IsPrivate = entity.IsPrivate;
-      document.IsDeleted = false;
-
-      // Can I do this instead of example above
-      // document.UpdateEntity(entity);
-
-      await base.SaveChangesAsync(cancellationToken);
-
-      return document;
-    }
-    catch
-    {
-      return Error.Unexpected();
-    }
-  }
+    => await base.ModifyAsync(entity, saveChanges, cancellationToken);
 
   public new async ValueTask<ErrorOr<Document>> RemoveAsync(Document entity,
                                                       bool saveChanges = true,

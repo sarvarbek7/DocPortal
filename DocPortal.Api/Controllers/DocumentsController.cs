@@ -129,8 +129,10 @@ public class DocumentsController(IDocumentService documentService,
   {
     try
     {
+      PageOptions pageOptions = null;
+
       var documentTypes =
-        documentTypeService.RetrieveAll(null);
+        documentTypeService.RetrieveAll(pageOptions, ignorePagination: true);
 
       return Ok(new
       {
@@ -261,7 +263,7 @@ public class DocumentsController(IDocumentService documentService,
   [HttpGet("download")]
   public async ValueTask<IActionResult> DownloadDocument([FromQuery] Guid id)
   {
-    FileStream stream = null;
+    //FileStream stream = null;
 
     try
     {
@@ -297,12 +299,12 @@ public class DocumentsController(IDocumentService documentService,
 
       string extension = Path.GetExtension(storedDocument.StoragePath);
 
-      stream = new FileStream(documentPath,
+      var stream = new FileStream(documentPath,
                               FileMode.Open,
                               FileAccess.Read,
                               FileShare.Read);
 
-      return File(stream, "application/octet-stream", fileDownloadName: Path.Combine(storedDocument.Title, extension));
+      return File(stream, "application/octet-stream", fileDownloadName: $"{storedDocument.Title}{extension}");
     }
     catch (Exception ex)
     {

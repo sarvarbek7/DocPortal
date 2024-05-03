@@ -1,4 +1,5 @@
-﻿using DocPortal.Api.QueryServices;
+﻿using DocPortal.Api.Http;
+using DocPortal.Api.QueryServices;
 using DocPortal.Application.Options;
 using DocPortal.Application.Services;
 using DocPortal.Application.Services.Processing;
@@ -33,7 +34,9 @@ public class OrganizationsController(IOrganizationService organizationService,
   public IActionResult GetAllOrganizations([FromQuery] int? limit,
                                            [FromQuery] int? page,
                                            [FromQuery] string? title,
-                                           [FromQuery] int? parentId)
+                                           [FromQuery] int? parentId,
+                                           [FromQuery] string? orderby,
+                                           [FromQuery] bool isDescending = false)
   {
     try
     {
@@ -48,10 +51,15 @@ public class OrganizationsController(IOrganizationService organizationService,
       ICollection<string>? includedNavigationalProperties =
         queryService.ApplyIncludeQueries(includeQueryOptions);
 
+      var orderFunc =
+        queryService.ApplyOrderbyQuery(orderby, isDescending);
+
+
       var storedOrganizations = organizationService.RetrieveAll(pageOptions,
                                       predicate,
                                       asNoTracking: false,
-                                      includedNavigationalProperties);
+                                      includedNavigationalProperties,
+                                      orderFunc);
 
       var organizationDtos =
         mapper.Map<IEnumerable<OrganizationDto>>(storedOrganizations);
@@ -77,7 +85,8 @@ public class OrganizationsController(IOrganizationService organizationService,
   {
     try
     {
-      OrganizationIncludeQueryOptions queryOptions = new OrganizationIncludeQueryOptions(includeAdmins, includeDocuments, includeSubordinates);
+      OrganizationIncludeQueryOptions queryOptions =
+        new OrganizationIncludeQueryOptions(includeAdmins, includeDocuments, includeSubordinates);
 
       ICollection<string>? includedNavigationalProperties =
         queryService.ApplyIncludeQueries(queryOptions);
@@ -110,6 +119,15 @@ public class OrganizationsController(IOrganizationService organizationService,
     try
     {
       var organization = mapper.Map<Organization>(request);
+
+      var httpUserId =
+              HttpContextService.GetUserId(HttpContext);
+
+      if (int.TryParse(httpUserId, out int adminId))
+      {
+        organization.CreatedBy = adminId;
+        organization.UpdatedBy = adminId;
+      }
 
       var createdOrganizationOrError =
         await organizationService.AddEntityAsync(organization);

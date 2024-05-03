@@ -25,8 +25,6 @@ namespace DocPortal.Api.Filters
       {
         context.Result = new UnauthorizedResult();
       }
-
-      Console.ReadKey();
     }
   }
 }

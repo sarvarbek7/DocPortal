@@ -15,7 +15,8 @@ public interface ICrudService<TEntity, TId>
                                    Expression<Func<TEntity, bool>>? predicate = null,
                                    bool asNoTracking = false,
                                    ICollection<string>? includedNavigationalProperties = null,
-                                   Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderFunc = null);
+                                   Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderFunc = null,
+                                   bool ignorePagination = false);
 
   ValueTask<ErrorOr<TEntity?>> RetrieveByIdAsync(TId id,
                                          CancellationToken cancellationToken = default);
