@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 
-using DocPortal.Api.Filters;
 using DocPortal.Api.Http;
+using DocPortal.Api.MiddlewareAndFilters;
 using DocPortal.Api.QueryServices;
 using DocPortal.Application.Options;
 using DocPortal.Application.Services;
@@ -284,8 +284,6 @@ public class DocumentsController(IDocumentService documentService,
   [HttpGet("download")]
   public async ValueTask<IActionResult> DownloadDocument([FromQuery] Guid id)
   {
-    //FileStream stream = null;
-
     try
     {
       ErrorOr<Document?> errorOrStoredDocument =
@@ -324,6 +322,9 @@ public class DocumentsController(IDocumentService documentService,
                               FileMode.Open,
                               FileAccess.Read,
                               FileShare.Read);
+
+      storedDocument.DownloadCount++;
+      await documentService.SaveChangesAsync();
 
       return File(stream, "application/octet-stream", fileDownloadName: $"{storedDocument.Title}{extension}");
     }

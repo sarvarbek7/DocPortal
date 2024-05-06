@@ -15,6 +15,8 @@ internal sealed class UserEntityConfiguration : IEntityTypeConfiguration<User>
 
     builder.HasKey(entity => entity.Id);
 
+    builder.HasIndex(entity => entity.PhysicalIdentity).IsUnique();
+
     //////////////////////////////////////////////////////////////////////
 
     // IEntity

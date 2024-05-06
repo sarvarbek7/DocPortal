@@ -13,7 +13,7 @@ public sealed class Document : Entity<Guid, int>
   public int DocumentTypeId { get; set; }
   public Organization? Organization { get; set; }
   public DocumentType? DocumentType { get; set; }
-
+  public int DownloadCount { get; set; }
   public override void UpdateEntityState(IEntity basedOnThisEntity)
   {
     if (basedOnThisEntity is not Document)

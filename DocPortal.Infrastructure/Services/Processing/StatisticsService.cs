@@ -122,4 +122,9 @@ internal class StatisticsService(ApplicationDbContext dbContext) : IStatisticsSe
 
     return documentCountByOrgAndDocType;
   }
+
+  public int GetDownloadsCount()
+  {
+    return dbContext.Documents.Sum(doc => doc.DownloadCount);
+  }
 }

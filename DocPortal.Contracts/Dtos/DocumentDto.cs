@@ -7,5 +7,6 @@ public record DocumentDto(Guid Id,
                           bool IsPrivate,
                           int OrganizationId,
                           int DocumentTypeId,
+                          int DownloadCount,
                           DocumentTypeDto? DocumentType,
                           OrganizationDto? Organization);

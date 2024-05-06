@@ -42,6 +42,7 @@ public class UsersController(IUserService userService,
   {
     try
     {
+      var c = HttpContext;
       var pageOptions = new PageOptions(limit, page);
 
       var filterOptions = new UserFilterOptions(keyword);

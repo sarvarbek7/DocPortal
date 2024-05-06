@@ -3,6 +3,7 @@ using System;
 using DocPortal.Persistance.DataContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DocPortal.Persistance.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240506085839_AddUniqueCsToUserPhysicalIdentity")]
+    partial class AddUniqueCsToUserPhysicalIdentity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,10 +51,6 @@ namespace DocPortal.Persistance.Migrations
                     b.Property<int>("DocumentTypeId")
                         .HasColumnType("integer")
                         .HasColumnName("document_type_id");
-
-                    b.Property<int>("DownloadCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("download_count");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")

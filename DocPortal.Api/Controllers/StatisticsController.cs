@@ -32,7 +32,7 @@ public class StatisticsController(IStatisticsService statisticsService,
     {
       int documentsCount = statisticsService.GetDocumentsCount(null);
       int organizationsCount = statisticsService.GetOrganizationsCount(null);
-      int downloadsCount = 0;
+      int downloadsCount = statisticsService.GetDownloadsCount();
 
       return Ok(new GeneralStatisticsResponse(documentsCount,
                                               organizationsCount,

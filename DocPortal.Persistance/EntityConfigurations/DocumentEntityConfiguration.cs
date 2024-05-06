@@ -78,6 +78,9 @@ internal sealed class DocumentEntityConfiguration : IEntityTypeConfiguration<Doc
     builder.Property(entity => entity.DocumentTypeId)
       .HasColumnName("document_type_id");
 
+    builder.Property(entity => entity.DownloadCount)
+      .HasColumnName("download_count");
+
     builder.HasOne(entity => entity.Organization)
       .WithMany(org => org.Documents)
       .HasForeignKey(entity => entity.OrganizationId);

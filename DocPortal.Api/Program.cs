@@ -61,6 +61,7 @@ internal class Program
 
     app.UseCors(_myCustomCorsPolicy);
 
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllers();
