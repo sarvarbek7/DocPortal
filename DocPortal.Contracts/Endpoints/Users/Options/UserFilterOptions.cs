@@ -2,4 +2,4 @@
 
 namespace DocPortal.Contracts.Endpoints.Users.Options;
 
-public record UserFilterOptions(string? Keyword) : IFilterOptions<User>;
+public record UserFilterOptions(string? Keyword, bool? isDeleted = null) : IFilterOptions<User>;

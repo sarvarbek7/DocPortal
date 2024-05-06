@@ -27,6 +27,8 @@ namespace DocPortal.Api.Controllers;
 public class UsersController(IUserService userService,
                              IUserOrganizationService userOrganizationService,
                              IStatisticsService statisticsService,
+                             IDeletedEntitesService deletedEntitesService,
+                             [FromKeyedServices("userAudit")] IAuditService<int> auditService,
                              IQueryService<User> queryService,
                              IMapper mapper) : _ApiController
 {
@@ -163,7 +165,6 @@ public class UsersController(IUserService userService,
       if (int.TryParse(httpUserId, out int adminId))
       {
         user.CreatedBy = adminId;
-        user.UpdatedBy = adminId;
       }
 
       var createdUserOrError =
@@ -187,6 +188,14 @@ public class UsersController(IUserService userService,
     {
       var user = mapper.Map<User>(request);
 
+      var httpUserId =
+              HttpContextService.GetUserId(HttpContext);
+
+      if (int.TryParse(httpUserId, out int adminId))
+      {
+        user.UpdatedBy = adminId;
+      }
+
       var modifiedOrganizationOrError =
         await userService.ModifyAsync(user);
 
@@ -206,8 +215,18 @@ public class UsersController(IUserService userService,
   {
     try
     {
+      int? deletedBy = null;
+
+      var httpUserId =
+              HttpContextService.GetUserId(HttpContext);
+
+      if (int.TryParse(httpUserId, out int adminId))
+      {
+        deletedBy = adminId;
+      }
+
       ErrorOr<User> deletedUserOrError =
-        await userService.RemoveByIdAsync(id);
+        await userService.RemoveByIdAsync(id, deletedBy: deletedBy);
 
       return deletedUserOrError.Match(
         onValue: value => Ok(mapper.Map<UserDto>(value)),
@@ -283,6 +302,112 @@ public class UsersController(IUserService userService,
       return errorOrAssignedOrganization.Match(
         value => NoContent(),
         Problem);
+    }
+    catch
+    {
+      return Problem([Error.Unexpected()]);
+    }
+  }
+
+  [Authorize(Roles = Role.SuperAdmin)]
+  [HttpGet("{id:int:required}/audit")]
+  public async ValueTask<IActionResult> GetAuditDetails(int id)
+  {
+    try
+    {
+      var auditInfo = await auditService.BasicAuditInfo(id);
+
+      return Ok(new
+      {
+        CreatedBy = auditInfo.Item1.CreatedBy,
+        CreatedByFullName = auditInfo.Item1.CreatedByFullName,
+        CreatedAt = auditInfo.Item1.CreateAt,
+        UpdatedBy = auditInfo.Item2.UpdatedBy,
+        UpdatedByFullName = auditInfo.Item2.UpdatedByFullName,
+        UpdatedAt = auditInfo.Item2.UpdatedAt
+      });
+    }
+    catch
+    {
+      return Problem("Something went wrong to load audit details");
+    }
+  }
+
+  [Authorize(Roles = Role.SuperAdmin)]
+  [HttpGet("{id:int:required}/deleted-audit")]
+  public async ValueTask<IActionResult> GetAuditDeleted(int id)
+  {
+    try
+    {
+      var auditInfo = await auditService.DeletedAuditInfo<User>(id);
+
+      return Ok(auditInfo);
+    }
+    catch
+    {
+      return Problem("Something went wrong to load audit details");
+    }
+  }
+
+  [Authorize(Roles = Role.SuperAdmin)]
+  [HttpGet("deleted")]
+  public IActionResult GetAllDeletedUsers([FromQuery] int? limit,
+                                   [FromQuery] int? page,
+                                   [FromQuery] string? keyword,
+                                   [FromQuery] string? orderby,
+                                   [FromQuery] bool isDescending = false)
+  {
+    try
+    {
+      var pageOptions = new PageOptions(limit, page);
+
+      var filterOptions = new UserFilterOptions(keyword, true);
+
+      var predicate =
+        queryService.ApplyFilterOptions(filterOptions);
+
+      var orderFunc =
+        queryService.ApplyOrderbyQuery(orderby, isDescending);
+
+      var storedUsers = deletedEntitesService.RetrieveDeletedEntities(pageOptions,
+                                      predicate,
+                                      orderFunc: orderFunc);
+
+      var userDtos =
+        mapper.Map<IEnumerable<UserDto>>(storedUsers);
+
+      var response = new GetAllUsersResponse(
+        Users: userDtos,
+        Total: statisticsService.GetUsersCount(predicate),
+        PageSize: pageOptions.PageSize);
+
+      return Ok(response);
+    }
+    catch (Exception ex)
+    {
+      return Problem([Error.Unexpected(description: ex.Message)]);
+    }
+  }
+
+  [Authorize(Roles = Role.SuperAdmin)]
+  [HttpGet("restore/{id:int:required}")]
+  public async ValueTask<IActionResult> RestoreUserAsync(int id)
+  {
+    try
+    {
+      int? updatedBy = null;
+
+      var httpUserId =
+              HttpContextService.GetUserId(HttpContext);
+
+      if (int.TryParse(httpUserId, out int adminId))
+      {
+        updatedBy = adminId;
+      }
+
+      await deletedEntitesService.RestoreEntity<User, int>(new User { Id = id, UpdatedBy = updatedBy });
+
+      return NoContent();
     }
     catch
     {

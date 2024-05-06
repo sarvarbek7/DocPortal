@@ -30,6 +30,7 @@ public sealed class Document : Entity<Guid, int>
       this.RegisteredNumber = document.RegisteredNumber;
       this.RegisteredDate = document.RegisteredDate;
       this.IsPrivate = document.IsPrivate;
+      this.UpdatedBy = document.UpdatedBy;
     }
   }
 }

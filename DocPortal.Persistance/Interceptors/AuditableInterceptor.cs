@@ -32,8 +32,6 @@ internal sealed class AuditableInterceptor : SaveChangesInterceptor
       {
         SetCurrentPropertyValue(
             entry, nameof(IAuditableEntity.CreatedAt), now);
-        SetCurrentPropertyValue(
-            entry, nameof(IAuditableEntity.UpdatedAt), now);
       }
 
       if (entry.State == EntityState.Modified)

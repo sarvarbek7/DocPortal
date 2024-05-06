@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 
 using DocPortal.Api.Filters;
+using DocPortal.Api.Http;
 using DocPortal.Api.QueryServices;
 using DocPortal.Application.Options;
 using DocPortal.Application.Services;
@@ -27,6 +28,8 @@ namespace DocPortal.Api.Controllers;
 public class DocumentsController(IDocumentService documentService,
                                  IStatisticsService statisticsService,
                                  IDocumentTypeService documentTypeService,
+                                 IDeletedEntitesService deletedEntitesService,
+                                 [FromKeyedServices("documentAudit")] IAuditService<Guid> auditService,
                                  IQueryService<Document> queryService,
                                  IMapper mapper,
                                  IWebHostEnvironment environment) : _ApiController
@@ -225,8 +228,18 @@ public class DocumentsController(IDocumentService documentService,
   {
     try
     {
+      int? deletedBy = null;
+
+      var httpUserId =
+              HttpContextService.GetUserId(HttpContext);
+
+      if (int.TryParse(httpUserId, out int adminId))
+      {
+        deletedBy = adminId;
+      }
+
       var errorOrDeletedDocument =
-        await documentService.RemoveByIdAsync(id);
+        await documentService.RemoveByIdAsync(id, deletedBy: deletedBy);
 
       return errorOrDeletedDocument.Match(
         value => Ok(mapper.Map<DocumentDto>(value)),
@@ -245,6 +258,14 @@ public class DocumentsController(IDocumentService documentService,
     try
     {
       var documentFromDto = mapper.Map<Document>(document);
+
+      var httpUserId =
+              HttpContextService.GetUserId(HttpContext);
+
+      if (int.TryParse(httpUserId, out int adminId))
+      {
+        documentFromDto.UpdatedBy = adminId;
+      }
 
       var errorOrUpdatedDocument =
         await documentService.ModifyAsync(documentFromDto);
@@ -309,6 +330,129 @@ public class DocumentsController(IDocumentService documentService,
     catch (Exception ex)
     {
       Console.WriteLine(ex);
+      return Problem([Error.Unexpected()]);
+    }
+  }
+
+  [Authorize(Roles = Role.SuperAdmin)]
+  [HttpGet("{id:guid:required}/audit")]
+  public async ValueTask<IActionResult> GetAuditDetails(Guid id)
+  {
+    try
+    {
+      var auditInfo = await auditService.BasicAuditInfo(id);
+
+      return Ok(new
+      {
+        CreatedBy = auditInfo.Item1.CreatedBy,
+        CreatedByFullName = auditInfo.Item1.CreatedByFullName,
+        CreatedAt = auditInfo.Item1.CreateAt,
+        UpdatedBy = auditInfo.Item2.UpdatedBy,
+        UpdatedByFullName = auditInfo.Item2.UpdatedByFullName,
+        UpdatedAt = auditInfo.Item2.UpdatedAt
+      });
+    }
+    catch
+    {
+      return Problem("Something went wrong to load audit details");
+    }
+  }
+
+  [Authorize(Roles = Role.SuperAdmin)]
+  [HttpGet("{id:guid:required}/deleted-audit")]
+  public async ValueTask<IActionResult> GetAuditDeleted(Guid id)
+  {
+    try
+    {
+      var auditInfo = await auditService.DeletedAuditInfo<Document>(id);
+
+      return Ok(auditInfo);
+    }
+    catch
+    {
+      return Problem("Something went wrong to load audit details");
+    }
+  }
+
+  [Authorize(Roles = Role.SuperAdmin)]
+  [HttpGet("deleted")]
+  public IActionResult GetAllDeletedDocuments([FromQuery] int? limit,
+                                       [FromQuery] int? page,
+                                       [FromQuery] int? organizationId,
+                                       [FromQuery] int? documentTypeId,
+                                       [FromQuery] string? title,
+                                       [FromQuery] string? registerNumber,
+                                       [FromQuery] DateOnly? startDate,
+                                       [FromQuery] DateOnly? endDate,
+                                       [FromQuery] string? orderby,
+                                       [FromQuery] bool isDescending = false)
+  {
+    try
+    {
+      var pageOptions = new PageOptions(
+        limit,
+        page);
+
+      var documentFilterOptions = new DocumentFilterOptions(title,
+                                                            registerNumber,
+                                                            organizationId,
+                                                            documentTypeId,
+                                                            startDate,
+                                                            endDate,
+                                                            true);
+
+      Expression<Func<Document, bool>>? predicate =
+        queryService.ApplyFilterOptions(documentFilterOptions);
+
+      int total = statisticsService.GetDocumentsCount(predicate);
+
+      var documentIncludeQueryOptions = new DocumentIncludeQueryOptions(true, false);
+
+      ICollection<string> includedNavigationalProperties =
+        queryService.ApplyIncludeQueries(documentIncludeQueryOptions);
+
+      var orderFunc = queryService.ApplyOrderbyQuery(orderby, isDescending);
+
+      var documents =
+        deletedEntitesService.RetrieveDeletedEntities(pageOptions,
+                                                      predicate,
+                                                      asNoTracking: false,
+                                                      orderFunc,
+                                                      ignorePagination: false);
+
+      return Ok(new GetAllDocumentsResponse(
+        mapper.Map<IEnumerable<DocumentDto>>(documents),
+        total,
+        pageOptions.PageSize));
+    }
+    catch
+    {
+      return Problem([Error.Unexpected()]);
+    }
+  }
+
+  [Authorize(Roles = Role.SuperAdmin)]
+  [HttpGet("restore/{id:guid:required}")]
+  public async ValueTask<IActionResult> RestoreDocument(Guid id)
+  {
+    try
+    {
+      int? updatedBy = null;
+
+      var httpUserId =
+              HttpContextService.GetUserId(HttpContext);
+
+      if (int.TryParse(httpUserId, out int adminId))
+      {
+        updatedBy = adminId;
+      }
+
+      await deletedEntitesService.RestoreEntity<Document, int>(new Document { Id = id, UpdatedBy = updatedBy });
+
+      return NoContent();
+    }
+    catch
+    {
       return Problem([Error.Unexpected()]);
     }
   }

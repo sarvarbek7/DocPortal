@@ -44,8 +44,9 @@ internal class OrganizationService(IOrganizationRepository repository, IValidato
 
   public new async ValueTask<ErrorOr<Organization>> RemoveByIdAsync(int id,
                                                           bool saveChanges = true,
-                                                          CancellationToken cancellationToken = default)
-    => await base.RemoveByIdAsync(id, saveChanges, cancellationToken);
+                                                          CancellationToken cancellationToken = default,
+                                                          int? deletedBy = null)
+    => await base.RemoveByIdAsync(id, saveChanges, cancellationToken, deletedBy);
 
   public new IEnumerable<Organization> RetrieveAll(PageOptions pageOptions,
                                                Expression<Func<Organization, bool>>? predicate = null,

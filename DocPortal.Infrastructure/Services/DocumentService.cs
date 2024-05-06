@@ -63,8 +63,9 @@ internal class DocumentService(IDocumentRepository repository, IValidator<Docume
 
   public new async ValueTask<ErrorOr<Document>> RemoveByIdAsync(Guid id,
                                                           bool saveChanges = true,
-                                                          CancellationToken cancellationToken = default)
-    => await base.RemoveByIdAsync(id, saveChanges, cancellationToken);
+                                                          CancellationToken cancellationToken = default,
+                                                          int? deletedBy = null)
+    => await base.RemoveByIdAsync(id, saveChanges, cancellationToken, deletedBy);
 
   public new IEnumerable<Document> RetrieveAll(PageOptions pageOptions,
                                                     Expression<Func<Document, bool>>? predicate = null,

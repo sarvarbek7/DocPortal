@@ -29,7 +29,9 @@ internal class OrganizationQueryService : IQueryService<Organization>
         (keyword == null || org.PhysicalIdentity.ToLower().Contains(keyword))
        )
        &&
-       (parentId == null || org.PrimaryOrganizationId == parentId);
+       (parentId == null || org.PrimaryOrganizationId == parentId)
+       &&
+       (filter.isDeleted == null || org.IsDeleted);
 
     return predicate;
   }

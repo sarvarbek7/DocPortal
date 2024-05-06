@@ -25,6 +25,13 @@ internal sealed class SoftDeletedInterceptor : SaveChangesInterceptor
       {
         entiry.Property(nameof(ISoftDeletedEntity.IsDeleted)).CurrentValue = true;
         entiry.Property(nameof(ISoftDeletedEntity.DeletedAt)).CurrentValue = DateTime.Now;
+
+        if (entiry.Entity is ISoftDeteledEntity<int>)
+        {
+          entiry.Property(nameof(ISoftDeteledEntity<int>.DeletedBy)).CurrentValue =
+            entiry.CurrentValues.GetValue<int?>(nameof(ISoftDeteledEntity<int>.DeletedBy));
+        }
+
         entiry.State = EntityState.Modified;
       }
     }

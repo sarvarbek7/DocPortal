@@ -37,8 +37,9 @@ internal class UserService(IUserRepository repository, IValidator<User> validato
 
   public new async ValueTask<ErrorOr<User>> RemoveByIdAsync(int id,
                                                           bool saveChanges = true,
-                                                          CancellationToken cancellationToken = default)
-    => await base.RemoveByIdAsync(id, saveChanges, cancellationToken);
+                                                          CancellationToken cancellationToken = default,
+                                                          int? deletedBy = null)
+    => await base.RemoveByIdAsync(id, saveChanges, cancellationToken, deletedBy);
 
   public new IEnumerable<User> RetrieveAll(PageOptions pageOptions,
                                                     Expression<Func<User, bool>>? predicate = null,

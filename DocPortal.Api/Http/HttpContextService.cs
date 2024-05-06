@@ -1,5 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 
 namespace DocPortal.Api.Http
 {
@@ -15,7 +14,7 @@ namespace DocPortal.Api.Http
       }
 
       var userIdClaim =
-        claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub);
+        claims.FirstOrDefault(claim => claim.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
 
       if (userIdClaim is null)
       {

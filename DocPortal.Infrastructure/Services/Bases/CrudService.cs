@@ -129,14 +129,15 @@ internal abstract class CrudService<TEntity, TId>(
 
   public async ValueTask<ErrorOr<TEntity>> RemoveByIdAsync(TId id,
                                                            bool saveChanges = true,
-                                                           CancellationToken cancellationToken = default)
+                                                           CancellationToken cancellationToken = default,
+                                                           int? deletedBy = null)
   {
     try
     {
       if (!await repository.EntityExistsAsync((ent) => ent.Id.Equals(id)))
       {
         return Error.NotFound(code: $"{typeof(TEntity).Name}.NotFound",
-          description: $"Modified {typeof(TEntity).Name} with id {id} is not exists.");
+          description: $"Deleted {typeof(TEntity).Name} with id {id} is not exists.");
       }
 
       var errorOrEntity = await this.RetrieveByIdAsync(id, cancellationToken);
@@ -146,8 +147,15 @@ internal abstract class CrudService<TEntity, TId>(
         return errorOrEntity.FirstError;
       }
 
+      var foundEntity = errorOrEntity.Value!;
+
+      if (foundEntity is ISoftDeteledEntity<int>)
+      {
+        (foundEntity as ISoftDeteledEntity<int>).DeletedBy = deletedBy;
+      }
+
       var deletedEntity =
-        await repository.DeleteEntityAsync(errorOrEntity.Value!, saveChanges, cancellationToken);
+        await repository.DeleteEntityAsync(foundEntity, saveChanges, cancellationToken);
 
       return deletedEntity;
     }

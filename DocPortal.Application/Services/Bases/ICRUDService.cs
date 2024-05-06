@@ -35,7 +35,8 @@ public interface ICrudService<TEntity, TId>
 
   ValueTask<ErrorOr<TEntity>> RemoveByIdAsync(TId id,
                                 bool saveChanges = true,
-                                CancellationToken cancellationToken = default);
+                                CancellationToken cancellationToken = default,
+                                int? deletedBy = null);
 
   Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

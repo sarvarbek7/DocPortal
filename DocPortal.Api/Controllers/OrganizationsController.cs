@@ -26,6 +26,8 @@ namespace DocPortal.Api.Controllers;
 public class OrganizationsController(IOrganizationService organizationService,
                                      IStatisticsService statisticsService,
                                      IUserOrganizationService userOrganizationService,
+                                     IDeletedEntitesService deletedEntitesService,
+                                     [FromKeyedServices("organizationAudit")] IAuditService<int> auditService,
                                      IQueryService<Organization> queryService,
                                      IMapper mapper) : _ApiController
 {
@@ -126,7 +128,6 @@ public class OrganizationsController(IOrganizationService organizationService,
       if (int.TryParse(httpUserId, out int adminId))
       {
         organization.CreatedBy = adminId;
-        organization.UpdatedBy = adminId;
       }
 
       var createdOrganizationOrError =
@@ -149,6 +150,18 @@ public class OrganizationsController(IOrganizationService organizationService,
     {
       var organization = mapper.Map<Organization>(request);
 
+      int? updatedBy = null;
+
+      var httpUserId =
+              HttpContextService.GetUserId(HttpContext);
+
+      if (int.TryParse(httpUserId, out int adminId))
+      {
+        updatedBy = adminId;
+      }
+
+      organization.UpdatedBy = updatedBy;
+
       var modifiedOrganizationOrError =
         await organizationService.ModifyAsync(organization);
 
@@ -167,8 +180,18 @@ public class OrganizationsController(IOrganizationService organizationService,
   {
     try
     {
+      int? deletedBy = null;
+
+      var httpUserId =
+              HttpContextService.GetUserId(HttpContext);
+
+      if (int.TryParse(httpUserId, out int adminId))
+      {
+        deletedBy = adminId;
+      }
+
       var deletedOrganizationOrError =
-        await organizationService.RemoveByIdAsync(id);
+        await organizationService.RemoveByIdAsync(id, deletedBy: deletedBy);
 
       return deletedOrganizationOrError.Match(
         value => Ok(mapper.Map<OrganizationDto>(value)),
@@ -219,6 +242,119 @@ public class OrganizationsController(IOrganizationService organizationService,
       when (ex.InnerException is Npgsql.PostgresException inner && inner.SqlState == "23503")
     {
       return Problem([Error.NotFound("AssignedOrganizations.NotFound", description: "Some of assigned users not found in database")]);
+    }
+    catch
+    {
+      return Problem([Error.Unexpected()]);
+    }
+  }
+
+  [Authorize(Roles = Role.SuperAdmin)]
+  [HttpGet("{id:int:required}/audit")]
+  public async ValueTask<IActionResult> GetAuditDetails(int id)
+  {
+    try
+    {
+      var auditInfo = await auditService.BasicAuditInfo(id);
+
+      return Ok(new
+      {
+        CreatedBy = auditInfo.Item1.CreatedBy,
+        CreatedByFullName = auditInfo.Item1.CreatedByFullName,
+        CreatedAt = auditInfo.Item1.CreateAt,
+        UpdatedBy = auditInfo.Item2.UpdatedBy,
+        UpdatedByFullName = auditInfo.Item2.UpdatedByFullName,
+        UpdatedAt = auditInfo.Item2.UpdatedAt
+      });
+    }
+    catch
+    {
+      return Problem("Something went wrong to load audit details");
+    }
+  }
+
+  [Authorize(Roles = Role.SuperAdmin)]
+  [HttpGet("{id:int:required}/deleted-audit")]
+  public async ValueTask<IActionResult> GetAuditDeleted(int id)
+  {
+    try
+    {
+      var auditInfo = await auditService.DeletedAuditInfo<Organization>(id);
+
+      return Ok(auditInfo);
+    }
+    catch
+    {
+      return Problem("Something went wrong to load audit details");
+    }
+  }
+
+  [Authorize(Roles = Role.SuperAdmin)]
+  [HttpGet("deleted")]
+  public IActionResult GetAllDeletedOrganizations([FromQuery] int? limit,
+                                         [FromQuery] int? page,
+                                         [FromQuery] string? title,
+                                         [FromQuery] int? parentId,
+                                         [FromQuery] string? orderby,
+                                         [FromQuery] bool isDescending = false)
+  {
+    try
+    {
+      var pageOptions = new PageOptions(limit, page);
+
+      var filterOptions = new OrganizationFilterOptions(title, parentId, true);
+      var includeQueryOptions = new OrganizationIncludeQueryOptions();
+
+      var predicate =
+        queryService.ApplyFilterOptions(filterOptions);
+
+      ICollection<string>? includedNavigationalProperties =
+        queryService.ApplyIncludeQueries(includeQueryOptions);
+
+      var orderFunc =
+        queryService.ApplyOrderbyQuery(orderby, isDescending);
+
+
+      var storedOrganizations = deletedEntitesService.RetrieveDeletedEntities(pageOptions,
+                                                                              predicate,
+                                                                              asNoTracking: false,
+                                                                              orderFunc,
+                                                                              ignorePagination: false);
+
+      var organizationDtos =
+        mapper.Map<IEnumerable<OrganizationDto>>(storedOrganizations);
+
+      var response = new GetAllOrganizationsResponse(organizationDtos,
+                                                  statisticsService.GetOrganizationsCount(predicate),
+                                                  pageOptions.PageSize);
+
+      return Ok(response);
+    }
+    catch
+    {
+      return Problem([Error.Unexpected()]);
+    }
+  }
+
+  [Authorize(Roles = Role.SuperAdmin)]
+  [HttpGet("restore/{id:int:required}")]
+  public async ValueTask<IActionResult> RestoreOrganization(int id)
+  {
+    try
+    {
+      int? updatedBy = null;
+
+      var httpUserId =
+              HttpContextService.GetUserId(HttpContext);
+
+      if (int.TryParse(httpUserId, out int adminId))
+      {
+        updatedBy = adminId;
+      }
+
+      await deletedEntitesService.RestoreEntity<Organization, int>(new Organization { Id = id, UpdatedBy = updatedBy });
+
+      return NoContent();
     }
     catch
     {

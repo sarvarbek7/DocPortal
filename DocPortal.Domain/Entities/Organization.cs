@@ -27,6 +27,7 @@ public sealed class Organization : Entity<int, int>
       this.PrimaryOrganizationId = organization.PrimaryOrganizationId;
       this.PhysicalIdentity = organization.PhysicalIdentity;
       this.Details = organization.Details;
+      this.UpdatedBy = organization.UpdatedBy;
     }
   }
 }

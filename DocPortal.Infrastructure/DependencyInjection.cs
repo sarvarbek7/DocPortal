@@ -1,6 +1,7 @@
 ﻿using DocPortal.Application.Common.Authentication.Services;
 using DocPortal.Application.Services;
 using DocPortal.Application.Services.Processing;
+using DocPortal.Domain.Entities;
 using DocPortal.Infrastructure.Common.Authentication.Services;
 using DocPortal.Infrastructure.Services;
 using DocPortal.Infrastructure.Services.Processing;
@@ -34,6 +35,11 @@ public static class DependencyInjection
   private static void AddProcessingServices(this IServiceCollection services)
   {
     services.AddScoped<IStatisticsService, StatisticsService>();
+    services.AddScoped<IDeletedEntitesService, DeletedEntitiesService>();
+    services.AddKeyedScoped<IAuditService<int>, AuditService<User, int>>("userAudit");
+    services.AddKeyedScoped<IAuditService<int>, AuditService<Organization, int>>("organizationAudit");
+    services.AddKeyedScoped<IAuditService<Guid>, AuditService<Document, Guid>>("documentAudit");
+
   }
 
   private static void AddFoundationServices(this IServiceCollection services)

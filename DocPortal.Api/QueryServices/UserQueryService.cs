@@ -21,12 +21,13 @@ internal class UserQueryService : IQueryService<User>
       return predicate;
     }
 
-    predicate = (user) =>
+    predicate = (user) => (
       (keyword == null || user.FirstName.ToLower().Contains(keyword)) ||
       (keyword == null || user.LastName.ToLower().Contains(keyword)) ||
       (keyword == null || user.PhysicalIdentity.ToLower().Contains(keyword)) ||
       (keyword == null || user.JobPosition.ToLower().Contains(keyword)) ||
-      (keyword == null || user.Role.ToLower().Contains(keyword));
+      (keyword == null || user.Role.ToLower().Contains(keyword))) &&
+      (filter.isDeleted == null || user.IsDeleted);
 
     return predicate;
   }

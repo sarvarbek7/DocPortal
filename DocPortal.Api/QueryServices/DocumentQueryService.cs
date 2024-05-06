@@ -32,7 +32,8 @@ namespace DocPortal.Api.QueryServices
         (organizationId == null || document.OrganizationId == organizationId) &&
         (documentTypeId == null || document.DocumentTypeId == documentTypeId) &&
         (startDate == null || document.RegisteredDate > startDate) &&
-        (endDate == null || document.RegisteredDate < endDate);
+        (endDate == null || document.RegisteredDate < endDate) &&
+        (filter.isDeleted == null || document.IsDeleted);
 
       return predicate;
     }

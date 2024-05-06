@@ -7,4 +7,5 @@ public record DocumentFilterOptions(string? Title,
                                     int? OrganizationId,
                                     int? DocumentTypeId,
                                     DateOnly? StartDate,
-                                    DateOnly? EndDate) : IFilterOptions<Document>;
+                                    DateOnly? EndDate,
+                                    bool? isDeleted = null) : IFilterOptions<Document>;

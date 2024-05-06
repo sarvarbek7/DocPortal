@@ -38,6 +38,7 @@ public sealed class User : Entity<int, int>
       this.LastName = user.LastName;
       this.JobPosition = user.JobPosition;
       this.Role = user.Role;
+      this.UpdatedBy = user.UpdatedBy;
     }
   }
 }
