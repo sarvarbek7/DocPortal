@@ -14,7 +14,6 @@ internal class Program
     {
       options.JsonSerializerOptions.AllowTrailingCommas = true;
       options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-      options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
       options.JsonSerializerOptions.WriteIndented = true;
     });
 
@@ -26,7 +25,6 @@ internal class Program
     {
       options.SerializerOptions.AllowTrailingCommas = true;
       options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-      options.SerializerOptions.PropertyNameCaseInsensitive = true;
       options.SerializerOptions.WriteIndented = true;
     });
 
@@ -37,7 +35,7 @@ internal class Program
       options.AddPolicy(name: _myCustomCorsPolicy,
         builder =>
         {
-          builder.WithOrigins("http://localhost:5173")
+          builder.WithOrigins("http://localhost:5173/")
           .AllowAnyMethod()
           .AllowAnyHeader();
         });
