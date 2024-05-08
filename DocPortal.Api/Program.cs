@@ -35,7 +35,7 @@ internal class Program
       options.AddPolicy(name: _myCustomCorsPolicy,
         builder =>
         {
-          builder.WithOrigins("http://localhost:5173/")
+          builder.WithOrigins("http://localhost:5173  ")
           .AllowAnyMethod()
           .AllowAnyHeader();
         });
