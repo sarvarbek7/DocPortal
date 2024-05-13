@@ -61,8 +61,9 @@ public class StatisticsController(IStatisticsService statisticsService,
     }
 
     Organization organization = errorOrOrganization.Value;
+    List<int> subs = statisticsService.GetSubordinates(organization.Id);
 
-    List<int> checkedIds = [.. statisticsService.GetSubordinates(organization.Id), organizationId];
+    List<int> checkedIds = [.. subs, organizationId];
 
     var docCountByOrgAndDocType =
       statisticsService.GetDocumentCountByOrgAndDoctype(
@@ -70,13 +71,14 @@ public class StatisticsController(IStatisticsService statisticsService,
 
     var getData = (Organization org) =>
     {
-      List<int> subCheckedIds =
-      [.. statisticsService.GetSubordinates(org.Id), org.Id];
+      List<int> subOfSubs = statisticsService.GetSubordinates(org.Id);
+      List<int> subCheckedIds = [.. subOfSubs, org.Id];
 
       return new
       {
         Id = org.Id,
         Title = org.Title,
+        HasSubordinate = subOfSubs.Any(),
         CountByDocType = documentTypes.Select(type => new
         {
           DocumentTypeId = type.Id,
@@ -91,6 +93,7 @@ public class StatisticsController(IStatisticsService statisticsService,
     {
       Id = organization.Id,
       Title = organization.Title,
+      HasSubordinate = subs.Any(),
       CountByDocType = documentTypes.Select(type => new
       {
         DocumentTypeId = type.Id,
@@ -98,7 +101,7 @@ public class StatisticsController(IStatisticsService statisticsService,
         dc.DocumentTypeId == type.Id &&
         checkedIds.Contains(dc.OrganizationId)).Sum(dc => dc.Count)
       }),
-      Subordinates = organization.Subordinates.Select(s => getData(s))
+      Subordinates = organization.Subordinates?.Select(s => getData(s))
     });
   }
 }

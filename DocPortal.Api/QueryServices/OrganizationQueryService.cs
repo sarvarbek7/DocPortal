@@ -43,6 +43,7 @@ internal class OrganizationQueryService : IQueryService<Organization>
 
     ICollection<string>? includedNavigationalProperties = [nameof(Organization.PrimaryOrganization)];
 
+
     if (includeQueryOptions is not null)
     {
       if (includedQuery.IncludeAdmins)

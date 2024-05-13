@@ -27,13 +27,13 @@ namespace DocPortal.Api.QueryServices
       }
 
       predicate = (document) =>
+        (filter.isDeleted == null || document.IsDeleted) &&
         (title == null || document.Title.ToLower().Contains(title)) &&
         (registerNumber == null || document.RegisteredNumber.ToLower().StartsWith(registerNumber)) &&
         (organizationId == null || document.OrganizationId == organizationId) &&
         (documentTypeId == null || document.DocumentTypeId == documentTypeId) &&
         (startDate == null || document.RegisteredDate > startDate) &&
-        (endDate == null || document.RegisteredDate < endDate) &&
-        (filter.isDeleted == null || document.IsDeleted);
+        (endDate == null || document.RegisteredDate < endDate);
 
       return predicate;
     }

@@ -33,9 +33,17 @@ internal class Program
     builder.Services.AddCors(options =>
     {
       options.AddPolicy(name: _myCustomCorsPolicy,
-        builder =>
+        corsBuilder =>
         {
-          builder.WithOrigins("http://localhost:5173  ")
+          IConfigurationSection? corsSection =
+            builder.Configuration.GetRequiredSection("Cors");
+
+          string originsAsString =
+          corsSection?.GetValue<string>("Origins") ?? string.Empty;
+
+          string[] origins = originsAsString.Split(';', StringSplitOptions.RemoveEmptyEntries);
+
+          corsBuilder.WithOrigins(origins)
           .AllowAnyMethod()
           .AllowAnyHeader();
         });
